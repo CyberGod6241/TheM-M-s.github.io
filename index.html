@@ -1,49 +1,13 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The M&M Plate - Nigerian Restaurant</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="script.js" defer></script>
+  <link src="input.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     /* Animation for fade-in and slide-up effect */
@@ -59,6 +23,7 @@
     }
   </style>
 </head>
+
 <body class="bg-gray-100 font-sans">
   <!-- Navbar -->
   <nav class="bg-green-600 text-white p-4 sticky top-0 z-10">
@@ -83,7 +48,8 @@
   </nav>
 
   <!-- Hero Section -->
-  <section id="home" class="bg-cover bg-center h-96 flex items-center justify-center text-white" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c')">
+  <section id="home" class="bg-cover bg-center h-96 flex items-center justify-center text-white"
+    style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c')">
     <div class="text-center bg-black bg-opacity-50 p-6 rounded">
       <h2 class="text-4xl font-bold mb-4">Welcome to The M&M Plate</h2>
       <p class="text-lg mb-6">Savor the Authentic Taste of Nigerian Cuisine</p>
@@ -101,84 +67,99 @@
           <h3 class="text-xl font-semibold mt-4">Jollof Rice</h3>
           <p class="text-gray-600">Spicy, flavorful rice dish with chicken and vegetables.</p>
           <p class="text-green-600 font-bold mt-2">₦2,500</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Jollof Rice', 2500)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Jollof Rice', 2500)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/egusi-2.jpg" alt="Egusi Soup" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Egusi Soup</h3>
           <p class="text-gray-600">Rich melon seed soup served with pounded yam.</p>
           <p class="text-green-600 font-bold mt-2">₦3,000</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Egusi Soup', 3000)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Egusi Soup', 3000)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/suya.jpg" alt="Suya" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Suya</h3>
           <p class="text-gray-600">Spicy grilled beef skewers with onions.</p>
           <p class="text-green-600 font-bold mt-2">₦1,500</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Suya', 1500)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Suya', 1500)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
-          <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092" alt="Tuwo" class="w-full h-48 object-cover rounded">
+          <img src="https://images.unsplash.com/photo-1600891964599-f61ba0e24092" alt="Tuwo"
+            class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Tuwo</h3>
           <p class="text-gray-600">Soft cornmeal dumpling served with vegetable stew.</p>
           <p class="text-green-600 font-bold mt-2">₦2,200</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Tuwo', 2200)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Tuwo', 2200)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
-          <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19" alt="Chinese Rice" class="w-full h-48 object-cover rounded">
+          <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19" alt="Chinese Rice"
+            class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Chinese Rice</h3>
           <p class="text-gray-600">Stir-fried rice with vegetables, shrimp, and soy sauce.</p>
           <p class="text-green-600 font-bold mt-2">₦2,800</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Chinese Rice', 2800)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Chinese Rice', 2800)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/amala2.jpg" alt="Amala" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Amala</h3>
           <p class="text-gray-600">Smooth yam flour dumpling with efo riro stew.</p>
           <p class="text-green-600 font-bold mt-2">₦2,700</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Amala', 2700)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Amala', 2700)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/Banga.jpg" alt="Banga Soup" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Banga Soup</h3>
           <p class="text-gray-600">Palm nut soup served with starch or fufu.</p>
           <p class="text-green-600 font-bold mt-2">₦3,200</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Banga Soup', 3200)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Banga Soup', 3200)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/okro.jpg" alt="Okra Soup" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Okra Soup</h3>
           <p class="text-gray-600">Fresh okra stew with fish and spices.</p>
           <p class="text-green-600 font-bold mt-2">₦2,900</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Okra Soup', 2900)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Okra Soup', 2900)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/beverage.jpg" alt="Beverages" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Beverages</h3>
           <p class="text-gray-600">Choice of Zobo, Kunu, or fresh fruit juice.</p>
           <p class="text-green-600 font-bold mt-2">₦1,000</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Beverages', 1000)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Beverages', 1000)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/fruit salad.jpg" alt="Fruit Salads" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Fruit Salads</h3>
           <p class="text-gray-600">Fresh mix of tropical fruits with a honey drizzle.</p>
           <p class="text-green-600 font-bold mt-2">₦1,800</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Fruit Salads', 1800)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Fruit Salads', 1800)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
           <img src="PICTURES/dougnut 2.jpg" alt="Doughnuts" class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Doughnuts</h3>
           <p class="text-gray-600">Soft, sweet doughnuts with a sugar glaze.</p>
           <p class="text-green-600 font-bold mt-2">₦800</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Doughnuts', 800)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Doughnuts', 800)">Add to Order</button>
         </div>
         <div class="bg-white rounded-lg shadow-lg p-6 menu-item">
-          <img src="PICTURES/pounded.jpg" alt="Pounded Yam with Vegetable Soup" class="w-full h-48 object-cover rounded">
+          <img src="PICTURES/pounded.jpg" alt="Pounded Yam with Vegetable Soup"
+            class="w-full h-48 object-cover rounded">
           <h3 class="text-xl font-semibold mt-4">Pounded Yam with Vegetable Soup</h3>
           <p class="text-gray-600">Smooth pounded yam served with rich vegetable stew.</p>
           <p class="text-green-600 font-bold mt-2">₦3,000</p>
-          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700" onclick="addToOrder('Pounded Yam with Vegetable Soup', 3000)">Add to Order</button>
+          <button class="bg-green-600 text-white px-4 py-2 mt-4 rounded hover:bg-green-700"
+            onclick="addToOrder('Pounded Yam with Vegetable Soup', 3000)">Add to Order</button>
         </div>
       </div>
     </div>
@@ -189,7 +170,8 @@
     <div class="container mx-auto px-4 text-center">
       <h2 class="text-3xl font-bold mb-8">About The M&M Plate</h2>
       <p class="text-lg text-gray-700 max-w-2xl mx-auto">
-        The M&M Plate brings the vibrant flavors of Nigeria to your table. From our signature Jollof Rice to hearty Egusi Soup, we use fresh ingredients and traditional recipes to create an unforgettable dining experience.
+        The M&M Plate brings the vibrant flavors of Nigeria to your table. From our signature Jollof Rice to hearty
+        Egusi Soup, we use fresh ingredients and traditional recipes to create an unforgettable dining experience.
       </p>
     </div>
   </section>
@@ -218,7 +200,8 @@
             <label class="block text-gray-700">Address</label>
             <textarea id="customerAddress" class="w-full p-2 border rounded" required></textarea>
           </div>
-          <button class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 w-full" onclick="submitOrder()">Submit Order</button>
+          <button class="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 w-full"
+            onclick="submitOrder()">Submit Order</button>
         </div>
       </div>
     </div>
@@ -231,85 +214,6 @@
       <p class="mt-2">Contact: info@mmplate.com | +234 123 456 7890</p>
     </div>
   </footer>
-
-  <script>
-    let order = [];
-    let total = 0;
-
-    function toggleMenu() {
-      const menu = document.getElementById('mobileMenu');
-      menu.classList.toggle('hidden');
-    }
-
-    function addToOrder(item, price) {
-      order.push({ item, price });
-      total += price;
-      updateOrderSummary();
-    }
-
-    function updateOrderSummary() {
-      const orderItems = document.getElementById('orderItems');
-      const orderTotal = document.getElementById('orderTotal');
-      orderItems.innerHTML = '';
-      order.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = `${item.item} - ₦${item.price}`;
-        orderItems.appendChild(li);
-      });
-      orderTotal.textContent = total;
-    }
-
-    function submitOrder() {
-      const name = document.getElementById('customerName').value;
-      const phone = document.getElementById('customerPhone').value;
-      const address = document.getElementById('customerAddress').value;
-
-      if (!name || !phone || !address || order.length === 0) {
-        alert('Please fill in all fields and add items to your order.');
-        return;
-      }
-
-      const orderData = {
-        name,
-        phone,
-        address,
-        items: order,
-        total
-      };
-
-      // Store order locally
-      localStorage.setItem('lastOrder', JSON.stringify(orderData));
-      alert('Order submitted successfully! Check console for details.');
-      console.log('Order Details:', orderData);
-
-      // Reset form
-      order = [];
-      total = 0;
-      updateOrderSummary();
-      document.getElementById('customerName').value = '';
-      document.getElementById('customerPhone').value = '';
-      document.getElementById('customerAddress').value = '';
-    }
-
-    // Scroll effect for menu items
-    function handleScroll() {
-      const menuItems = document.querySelectorAll('.menu-item');
-      const triggerBottom = window.innerHeight * 0.85; // Trigger when item is 85% in view
-
-      menuItems.forEach(item => {
-        const boxTop = item.getBoundingClientRect().top;
-
-        if (boxTop < triggerBottom) {
-          item.classList.add('visible');
-        } else {
-          item.classList.remove('visible');
-        }
-      });
-    }
-
-    // Run on scroll and initial load
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('load', handleScroll);
-  </script>
 </body>
+
 </html>
