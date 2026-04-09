@@ -1,0 +1,125 @@
+[
+  {
+    "id": 1,
+    "name": "Jollof Rice",
+    "emoji": "🍛",
+    "desc": "Smoky party-style rice slow-cooked in a rich tomato base with aromatic spices.",
+    "unitLabel": "plate",
+    "unitPrice": 2500,
+    "category": "Rice & Swallows",
+    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80",
+    "badge": "🔥 Best Seller"
+  },
+  {
+    "id": 2,
+    "name": "Fried Rice",
+    "emoji": "🍚",
+    "desc": "Golden stir-fried rice loaded with vegetables, liver and mixed proteins.",
+    "unitLabel": "plate",
+    "unitPrice": 2500,
+    "category": "Rice & Swallows",
+    "img": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80"
+  },
+  {
+    "id": 3,
+    "name": "Egusi Soup",
+    "emoji": "🥘",
+    "desc": "Rich melon seed soup with assorted meat, served with pounded yam or fufu.",
+    "unitLabel": "wrap",
+    "unitPrice": 1500,
+    "category": "Soups",
+    "img": "https://images.unsplash.com/photo-1612392062422-c26a5e898793?w=600&q=80",
+    "badge": "👑 House Special"
+  },
+  {
+    "id": 4,
+    "name": "Amala & Ewedu",
+    "emoji": "🫙",
+    "desc": "Smooth dark yam flour swallow paired with silky ewedu and gbegiri stew.",
+    "unitLabel": "plate",
+    "unitPrice": 2700,
+    "category": "Rice & Swallows",
+    "img": "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&q=80"
+  },
+  {
+    "id": 5,
+    "name": "Pounded Yam",
+    "emoji": "🫕",
+    "desc": "Silky smooth pounded yam paired with rich efo riro vegetable stew.",
+    "unitLabel": "plate",
+    "unitPrice": 3000,
+    "category": "Rice & Swallows",
+    "img": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&q=80"
+  },
+  {
+    "id": 6,
+    "name": "Suya",
+    "emoji": "🍢",
+    "desc": "Spicy charcoal-grilled beef skewers marinated in yaji spice blend.",
+    "unitLabel": "stick",
+    "unitPrice": 500,
+    "category": "Protein & Grills",
+    "img": "https://images.unsplash.com/photo-1544025162-d76538780987?w=600&q=80",
+    "badge": "🌶 Spicy"
+  },
+  {
+    "id": 7,
+    "name": "Banga Soup",
+    "emoji": "🥣",
+    "desc": "Fragrant palm nut soup with catfish, periwinkle and native spices.",
+    "unitLabel": "wrap",
+    "unitPrice": 1700,
+    "category": "Soups",
+    "img": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80"
+  },
+  {
+    "id": 8,
+    "name": "Okra Soup",
+    "emoji": "🫘",
+    "desc": "Silky draw soup with smoked fish, assorted meat and crayfish.",
+    "unitLabel": "wrap",
+    "unitPrice": 1500,
+    "category": "Soups",
+    "img": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=80"
+  },
+  {
+    "id": 9,
+    "name": "Doughnuts",
+    "emoji": "🍩",
+    "desc": "Soft, pillowy golden doughnuts dusted with sugar glaze.",
+    "unitLabel": "piece",
+    "unitPrice": 300,
+    "category": "Snacks & Drinks",
+    "img": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&q=80"
+  },
+  {
+    "id": 10,
+    "name": "Zobo / Kunu",
+    "emoji": "🧃",
+    "desc": "House-made chilled hibiscus or millet drink, lightly spiced.",
+    "unitLabel": "cup",
+    "unitPrice": 500,
+    "category": "Snacks & Drinks",
+    "img": "https://images.unsplash.com/photo-1534353341046-2f57b5e81ea0?w=600&q=80"
+  },
+  {
+    "id": 11,
+    "name": "Fruit Salad",
+    "emoji": "🍉",
+    "desc": "Fresh tropical fruits tossed with honey, citrus zest and mint.",
+    "unitLabel": "bowl",
+    "unitPrice": 800,
+    "category": "Snacks & Drinks",
+    "img": "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=600&q=80"
+  },
+  {
+    "id": 12,
+    "name": "Chinese Rice",
+    "emoji": "🥡",
+    "desc": "Wok-fried rice with prawns, egg strips, soy and sesame oil.",
+    "unitLabel": "plate",
+    "unitPrice": 2800,
+    "category": "Rice & Swallows",
+    "img": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80"
+  }
+]
