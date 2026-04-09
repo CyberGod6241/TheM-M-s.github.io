@@ -25,7 +25,7 @@ function Navbar({ cartCount, onCartClick, T }) {
         borderBottom: scrolled ? `1px solid ${T.orange}25` : "none",
       }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-[95rem] mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex flex-col leading-none">
           <span
