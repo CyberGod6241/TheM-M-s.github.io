@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 function CartPanel({
   items,
   onRemove,
@@ -163,18 +164,20 @@ function CartPanel({
                 {fmt(total)}
               </span>
             </div>
-            <button
-              onClick={onCheckout}
-              className="w-full py-4 rounded-xl font-bold text-white text-base transition-all duration-200 hover:scale-[1.02]"
-              style={{
-                background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
-                boxShadow: `0 8px 32px ${T.orange}50`,
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Proceed to Checkout →
-            </button>
+            <Link to="/order">
+              <button
+                onClick={onCheckout}
+                className="w-full py-4 rounded-xl font-bold text-white text-base transition-all duration-200 hover:scale-[1.02]"
+                style={{
+                  background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+                  boxShadow: `0 8px 32px ${T.orange}50`,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Proceed to Checkout →
+              </button>
+            </Link>
           </div>
         )}
       </div>
