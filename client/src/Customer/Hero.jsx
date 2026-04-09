@@ -9,7 +9,7 @@ function Hero({ T }) {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 overflow-hidden"
+      className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-28 pb-20 overflow-hidden gap-6"
       style={{
         background: `linear-gradient(155deg,${T.brown900} 0%,${T.brown800} 50%,${T.brown600} 100%)`,
       }}

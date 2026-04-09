@@ -1,7 +1,15 @@
 import { useState } from "react";
 import Bokeh from "../Component/Bokeh";
+import SuccessModal from "../Customer/SuccesModal";
 
-function OrderSection({ cartItems, onPlaceOrder, T, fmt }) {
+function OrderSection({
+  cartItems,
+  onPlaceOrder,
+  T,
+  fmt,
+  successOrder,
+  setSuccessOrder,
+}) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -206,6 +214,12 @@ function OrderSection({ cartItems, onPlaceOrder, T, fmt }) {
               )}
             </div>
           ))}
+          <SuccessModal
+            order={successOrder}
+            onClose={() => setSuccessOrder(null)}
+            T={T}
+            fmt={fmt}
+          />
 
           {deliveryType === "delivery" && (
             <div>
