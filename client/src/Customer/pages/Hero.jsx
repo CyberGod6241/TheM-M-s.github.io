@@ -1,4 +1,4 @@
-import Bokeh from "../Component/Bokeh";
+import Bokeh from "./Bokeh";
 function Hero({ T }) {
   const stats = [
     { val: "12+", label: "Menu Items" },

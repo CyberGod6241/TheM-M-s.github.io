@@ -1,12 +1,12 @@
 import { useState } from "react";
-import Bokeh from "../Component/Bokeh";
-import SuccessModal from "../Customer/SuccesModal";
+import Bokeh from "../Customer/pages/Bokeh";
+import SuccessModal from "../Customer/pages/SuccesModal";
+import { T } from "../Customer/constant/theme";
+import { fmt } from "../Customer/utils/helpers";
 
 function OrderSection({
   cartItems,
   onPlaceOrder,
-  T,
-  fmt,
   successOrder,
   setSuccessOrder,
 }) {

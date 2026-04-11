@@ -1,19 +1,20 @@
-import Navbar from "../Customer/Navbar";
-import Hero from "../Customer/Hero";
-import MenuSection from "../Customer/MenuSection";
+import Navbar from "../Customer/pages/Navbar";
+import Hero from "../Customer/pages/Hero";
+import MenuSection from "../Customer/pages/MenuSection";
 import OrderSection from "./OrderSection";
-import Contact from "../Customer/Contact";
-import Footer from "../Customer/Footer";
-import CartPanel from "../Customer/CartPanel";
-import SuccessModal from "../Customer/SuccesModal";
-import MenuCard from "../Customer/MenuCard";
-import data from "../assets/data.json";
+import Contact from "../Customer/pages/Contact";
+import Footer from "../Customer/pages/Footer";
+import CartPanel from "../Customer/pages/CartPanel";
+import SuccessModal from "../Customer/pages/SuccesModal";
+import MenuCard from "../Customer/pages/MenuCard";
+import data from "../Customer/constant/data.json";
+
+import { T } from "../Customer/constant/theme";
+import { fmt } from "../Customer/utils/helpers";
 
 const MENU = data.map((m, i) => ({ id: i, ...m }));
 
 const CATEGORIES = ["All", ...Array.from(new Set(MENU.map((m) => m.category)))];
-
-// ─── BOKEH ───────────────────────────────────────────────────────────────────
 
 // ─── TOAST ───────────────────────────────────────────────────────────────────
 function Toast({ msg, visible, T }) {
@@ -38,8 +39,6 @@ function Toast({ msg, visible, T }) {
 }
 
 function Customer({
-  T,
-  fmt,
   cartItems,
   handleAdd,
   handleRemove,

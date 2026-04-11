@@ -1,34 +1,9 @@
 import LandingPage from "./Dashboard/LandingPage";
 import Customer from "./Dashboard/Customer";
 import OrderSection from "./Dashboard/OrderSection";
+import Admin from "./Dashboard/Admin";
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-
-const C = {
-  brown900: "#1E0A00",
-  brown800: "#3B1400",
-  brown700: "#5C2200",
-  brown600: "#7B3410",
-  orange: "#F97316",
-  orangeD: "#EA580C",
-  orangeL: "#FED7AA",
-  cream: "#FFF8F2",
-};
-
-// ─── THEME TOKENS ────────────────────────────────────────────────────────────
-const T = {
-  brown900: "#1E0A00",
-  brown800: "#3B1400",
-  brown700: "#5C2200",
-  brown600: "#7B3410",
-  orange: "#F97316",
-  orangeD: "#EA580C",
-  orangeL: "#FED7AA",
-  cream: "#FFF8F2",
-};
-
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-const fmt = (n) => `₦${n.toLocaleString("en-NG")}`;
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
@@ -83,12 +58,11 @@ function App() {
   };
   return (
     <Routes>
-      <Route path="/" element={<LandingPage Color={C} />} />
+      <Route path="/" element={<LandingPage />} />
       <Route
         path="/customer"
         element={
           <Customer
-            Color={C}
             cartItems={cartItems}
             setCartItems={setCartItems}
             cartOpen={cartOpen}
@@ -102,8 +76,6 @@ function App() {
             handleUpdateQty={handleUpdateQty}
             handleCheckout={handleCheckout}
             handlePlaceOrder={handlePlaceOrder}
-            T={T}
-            fmt={fmt}
           />
         }
       />
@@ -115,11 +87,10 @@ function App() {
             onPlaceOrder={handlePlaceOrder}
             successOrder={successOrder}
             setSuccessOrder={setSuccessOrder}
-            T={T}
-            fmt={fmt}
           />
         }
       />
+      <Route path="/admin" element={<Admin />} />
     </Routes>
   );
 }
