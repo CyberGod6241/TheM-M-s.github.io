@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function Navbar({ cartCount, onCartClick, T }) {
   const [scrolled, setScrolled] = useState(false);
@@ -82,16 +83,16 @@ function Navbar({ cartCount, onCartClick, T }) {
               </span>
             )}
           </button>
-          <a
-            href="#order"
+          <Link
+            to="/view-order"
             className="hidden md:inline-flex px-5 py-2.5 rounded-full font-bold text-sm text-white transition-all duration-200 hover:scale-105"
             style={{
               background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
               boxShadow: `0 4px 20px ${T.orange}50`,
             }}
           >
-            Order Now
-          </a>
+            View Order
+          </Link>
           {/* Hamburger */}
           <button
             className="md:hidden text-xl"

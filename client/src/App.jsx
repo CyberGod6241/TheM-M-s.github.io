@@ -1,6 +1,7 @@
 import LandingPage from "./Dashboard/LandingPage";
 import Customer from "./Dashboard/Customer";
 import OrderSection from "./Dashboard/OrderSection";
+import ViewOrder from "./Dashboard/ViewOrder";
 import Admin from "./Dashboard/Admin";
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
@@ -91,6 +92,7 @@ function App() {
         }
       />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/view-order" element={<ViewOrder />} />
     </Routes>
   );
 }
