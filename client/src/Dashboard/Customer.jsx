@@ -7,14 +7,9 @@ import Footer from "../Customer/pages/Footer";
 import CartPanel from "../Customer/pages/CartPanel";
 import SuccessModal from "../Customer/pages/SuccesModal";
 import MenuCard from "../Customer/pages/MenuCard";
-import data from "../Customer/constant/data.json";
 
 import { T } from "../Customer/constant/theme";
 import { fmt } from "../Customer/utils/helpers";
-
-const MENU = data.map((m, i) => ({ id: i, ...m }));
-
-const CATEGORIES = ["All", ...Array.from(new Set(MENU.map((m) => m.category)))];
 
 // ─── TOAST ───────────────────────────────────────────────────────────────────
 function Toast({ msg, visible, T }) {
@@ -39,6 +34,7 @@ function Toast({ msg, visible, T }) {
 }
 
 function Customer({
+  menuItems,
   cartItems,
   handleAdd,
   handleRemove,
@@ -48,6 +44,12 @@ function Customer({
   handleCheckout,
   toast,
 }) {
+  const MENU = (menuItems || []).filter((item) => item.available);
+  const CATEGORIES = [
+    "All",
+    ...Array.from(new Set(MENU.map((m) => m.category))),
+  ];
+  console.log(MENU);
   return (
     <div
       style={{

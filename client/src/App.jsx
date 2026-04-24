@@ -5,12 +5,14 @@ import ViewOrder from "./Dashboard/ViewOrder";
 import Admin from "./Dashboard/Admin";
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import { SEED_MENU } from "./Admin/constants/data";
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState({ msg: "", visible: false });
   const [successOrder, setSuccessOrder] = useState(null);
+  const [menuItems, setMenuItems] = useState(SEED_MENU);
 
   const showToast = (msg) => {
     setToast({ msg, visible: true });
@@ -64,6 +66,7 @@ function App() {
         path="/customer"
         element={
           <Customer
+            menuItems={menuItems}
             cartItems={cartItems}
             setCartItems={setCartItems}
             cartOpen={cartOpen}
@@ -91,7 +94,10 @@ function App() {
           />
         }
       />
-      <Route path="/admin" element={<Admin />} />
+      <Route
+        path="/admin"
+        element={<Admin menuItems={menuItems} setMenuItems={setMenuItems} />}
+      />
       <Route path="/view-order" element={<ViewOrder />} />
     </Routes>
   );
