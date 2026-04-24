@@ -4,7 +4,7 @@
 import { useState, useRef } from "react";
 
 import { T } from "../Admin/constants/theme";
-import { SEED_ORDERS, SEED_MENU } from "../Admin/constants/data";
+import { SEED_ORDERS } from "../Admin/constants/data";
 
 import Sidebar from "../Admin/components/layouts/Sidebar";
 import { Toast } from "../Admin/components/ui";
@@ -16,7 +16,7 @@ import MenuManager from "../Admin/pages/MenuManager";
 import Analytics from "../Admin/pages/Analytics";
 import Settings from "../Admin/pages/Settings";
 
-function Admin() {
+function Admin({ menuItems, setMenuItems }) {
   // ── Auth ──────────────────────────────────────────────────────────────────
   const [authed, setAuthed] = useState(false);
 
@@ -26,7 +26,6 @@ function Admin() {
 
   // ── Global data ───────────────────────────────────────────────────────────
   const [orders, setOrders] = useState(SEED_ORDERS);
-  const [menuItems, setMenuItems] = useState(SEED_MENU);
 
   // ── Toast system ──────────────────────────────────────────────────────────
   const [toast, setToast] = useState({ msg: "", type: "info", visible: false });
