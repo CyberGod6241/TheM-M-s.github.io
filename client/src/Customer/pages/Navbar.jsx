@@ -17,7 +17,7 @@ function Navbar({ cartCount, onCartClick, T, user, handleLogout }) {
     { label: "Contact", href: "#contact" },
   ];
 
-  const UserName = user?.email?.split("@")[0] || "User";
+  const UserName = user?.email?.toUpperCase().split("@")[0] || "User";
 
   return (
     <nav
@@ -62,6 +62,23 @@ function Navbar({ cartCount, onCartClick, T, user, handleLogout }) {
               </a>
             </li>
           ))}
+          {handleLogout && (
+            <button
+              onClick={handleLogout}
+              className="hidden md:inline-flex text-sm font-medium transition-colors duration-200"
+              // style={{
+              //   background: "rgba(239,68,68,0.1)", 
+              //   border: "1px solid rgba(239,68,68,0.4)",
+              //   color: "#ef4444",
+              // }}
+              style={{
+                color: "rgba(255,255,255,.65)",
+                textDecoration: "none",
+              }}
+            >
+              Logout
+            </button>
+          )}
         </ul>
 
         {/* Right actions */}
@@ -103,19 +120,7 @@ function Navbar({ cartCount, onCartClick, T, user, handleLogout }) {
           >
             View Order
           </Link>
-          {handleLogout && (
-            <button
-              onClick={handleLogout}
-              className="hidden md:inline-flex px-4 py-2.5 rounded-full font-semibold text-sm transition-all duration-200"
-              style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.4)",
-                color: "#ef4444",
-              }}
-            >
-              Logout
-            </button>
-          )}
+
           {/* Hamburger */}
           <button
             className="md:hidden text-xl"
@@ -146,7 +151,7 @@ function Navbar({ cartCount, onCartClick, T, user, handleLogout }) {
               className="py-2 text-xs px-3 rounded-full"
               style={{ background: `${T.orange}20`, color: T.orange }}
             >
-              {user.email}
+              {UserName}
             </span>
           )}
           {links.map((l) => (
