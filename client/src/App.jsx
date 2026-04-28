@@ -3,11 +3,18 @@ import Customer from "./Dashboard/Customer";
 import OrderSection from "./Dashboard/OrderSection";
 import ViewOrder from "./Dashboard/ViewOrder";
 import Admin from "./Dashboard/Admin";
+import Login from "./Customer/pages/Login";
+import SignUp from "./Customer/pages/SignUp";
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { SEED_MENU } from "./Admin/constants/data";
 
+import { auth } from "./authentication/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 function App() {
+  // ── State for Customer Dashboard ─────────────────────────────────────────
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState({ msg: "", visible: false });
@@ -59,6 +66,67 @@ function App() {
     setSuccessOrder({ ...form, items: cartItems, total });
     setCartItems([]);
   };
+
+  // ── Auth for Customers ──────────────────────────────────────────────────────────────────
+  const [authed, setAuthed] = useState(false);
+
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+
+  const handleSignUp =
+    // Implement sign-up logic here (e.g., using Firebase Authentication)
+    async (e) => {
+      e.preventDefault();
+      setLoading(true);
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
+        const user = userCredential.user;
+        setUser(user);
+        setAuthed(true);
+        console.log("Signed up:", user);
+      } catch (error) {
+        setError("Failed to sign up");
+        console.error("Error code:", error.code, "Message:", error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
+      setUser(user);
+      setAuthed(true);
+      console.log("Logged in:", user);
+    } catch (error) {
+      setError("Invalid email or password");
+      console.error("Error code:", error.code, "Message:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSignUp();
+  };
+
+  const handleKeyDownLogin = (e) => {
+    if (e.key === "Enter") handleLogin();
+  };
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
@@ -80,6 +148,7 @@ function App() {
             handleUpdateQty={handleUpdateQty}
             handleCheckout={handleCheckout}
             handlePlaceOrder={handlePlaceOrder}
+            authed={authed}
           />
         }
       />
@@ -99,6 +168,40 @@ function App() {
         element={<Admin menuItems={menuItems} setMenuItems={setMenuItems} />}
       />
       <Route path="/view-order" element={<ViewOrder />} />
+      <Route
+        path="/Login"
+        element={
+          <Login
+            handleKeyDown={handleKeyDownLogin}
+            setPassword={setPassword}
+            setEmail={setEmail}
+            error={error}
+            loading={loading}
+            password={password}
+            email={email}
+            setError={setError}
+            setLoading={setLoading}
+            handleLogin={handleLogin}
+          />
+        }
+      />
+      <Route
+        path="/SignUp"
+        element={
+          <SignUp
+            handleKeyDown={handleKeyDown}
+            setPassword={setPassword}
+            setEmail={setEmail}
+            error={error}
+            loading={loading}
+            password={password}
+            email={email}
+            setError={setError}
+            setLoading={setLoading}
+            handleSignUp={handleSignUp}
+          />
+        }
+      />
     </Routes>
   );
 }

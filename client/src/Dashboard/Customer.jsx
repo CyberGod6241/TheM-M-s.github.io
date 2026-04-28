@@ -7,6 +7,7 @@ import Footer from "../Customer/pages/Footer";
 import CartPanel from "../Customer/pages/CartPanel";
 import SuccessModal from "../Customer/pages/SuccesModal";
 import MenuCard from "../Customer/pages/MenuCard";
+import SignUp from "../Customer/pages/SignUp";
 
 import { T } from "../Customer/constant/theme";
 import { fmt } from "../Customer/utils/helpers";
@@ -43,6 +44,7 @@ function Customer({
   cartOpen,
   handleCheckout,
   toast,
+  authed,
 }) {
   const MENU = (menuItems || []).filter((item) => item.available);
   const CATEGORIES = [
@@ -50,6 +52,10 @@ function Customer({
     ...Array.from(new Set(MENU.map((m) => m.category))),
   ];
   console.log(MENU);
+
+  // ── Guard: show login if not authenticated ─────────────────────────────
+  if (!authed) return <SignUp />;
+
   return (
     <div
       style={{
