@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-function Navbar({ cartCount, onCartClick, T }) {
+function Navbar({ cartCount, onCartClick, T, user, handleLogout }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   useEffect(() => {
@@ -16,6 +16,8 @@ function Navbar({ cartCount, onCartClick, T }) {
     { label: "Order", href: "#order" },
     { label: "Contact", href: "#contact" },
   ];
+
+  const UserName = user?.email?.split("@")[0] || "User";
 
   return (
     <nav
@@ -64,6 +66,14 @@ function Navbar({ cartCount, onCartClick, T }) {
 
         {/* Right actions */}
         <div className="flex items-center gap-3">
+          {user && (
+            <span
+              className="hidden md:inline-block text-xs px-3 py-1 rounded-full"
+              style={{ background: `${T.orange}20`, color: T.orange }}
+            >
+              {UserName}
+            </span>
+          )}
           <button
             onClick={onCartClick}
             className="relative flex items-center gap-2 px-4 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 hover:scale-105"
@@ -93,6 +103,19 @@ function Navbar({ cartCount, onCartClick, T }) {
           >
             View Order
           </Link>
+          {handleLogout && (
+            <button
+              onClick={handleLogout}
+              className="hidden md:inline-flex px-4 py-2.5 rounded-full font-semibold text-sm transition-all duration-200"
+              style={{
+                background: "rgba(239,68,68,0.1)",
+                border: "1px solid rgba(239,68,68,0.4)",
+                color: "#ef4444",
+              }}
+            >
+              Logout
+            </button>
+          )}
           {/* Hamburger */}
           <button
             className="md:hidden text-xl"
@@ -118,6 +141,14 @@ function Navbar({ cartCount, onCartClick, T }) {
             borderTop: `1px solid ${T.orange}20`,
           }}
         >
+          {user && (
+            <span
+              className="py-2 text-xs px-3 rounded-full"
+              style={{ background: `${T.orange}20`, color: T.orange }}
+            >
+              {user.email}
+            </span>
+          )}
           {links.map((l) => (
             <a
               key={l.label}
@@ -129,6 +160,22 @@ function Navbar({ cartCount, onCartClick, T }) {
               {l.label}
             </a>
           ))}
+          {handleLogout && (
+            <button
+              onClick={() => {
+                handleLogout();
+                setMobileOpen(false);
+              }}
+              className="py-2 px-3 rounded-full font-semibold text-sm mt-2 transition-all duration-200"
+              style={{
+                background: "rgba(239,68,68,0.1)",
+                border: "1px solid rgba(239,68,68,0.4)",
+                color: "#ef4444",
+              }}
+            >
+              Logout
+            </button>
+          )}
         </div>
       )}
     </nav>

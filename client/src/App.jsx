@@ -5,15 +5,21 @@ import ViewOrder from "./Dashboard/ViewOrder";
 import Admin from "./Dashboard/Admin";
 import Login from "./Customer/pages/Login";
 import SignUp from "./Customer/pages/SignUp";
-import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { SEED_MENU } from "./Admin/constants/data";
 
 import { auth } from "./authentication/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 
 function App() {
+  const navigate = useNavigate();
+
   // ── State for Customer Dashboard ─────────────────────────────────────────
   const [cartItems, setCartItems] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -66,52 +72,72 @@ function App() {
     setSuccessOrder({ ...form, items: cartItems, total });
     setCartItems([]);
   };
-
   // ── Auth for Customers ──────────────────────────────────────────────────────────────────
   const [authed, setAuthed] = useState(false);
-
+  const [authLoading, setAuthLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
 
-  const handleSignUp =
-    // Implement sign-up logic here (e.g., using Firebase Authentication)
-    async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password,
-        );
-        const user = userCredential.user;
-        setUser(user);
+  // ── Persist auth state across page refreshes ──────────────────────────────────────
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
         setAuthed(true);
-        console.log("Signed up:", user);
-      } catch (error) {
-        setError("Failed to sign up");
-        console.error("Error code:", error.code, "Message:", error.message);
-      } finally {
-        setLoading(false);
+      } else {
+        setUser(null);
+        setAuthed(false);
       }
-    };
+      setAuthLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const newUser = userCredential.user;
+      setUser(newUser);
+      setAuthed(true);
+      setEmail("");
+      setPassword("");
+      console.log("Signed up:", newUser);
+      navigate("/customer");
+    } catch (error) {
+      setError("Failed to sign up: " + error.message);
+      console.error("Error code:", error.code, "Message:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
         password,
       );
-      const user = userCredential.user;
-      setUser(user);
+      const newUser = userCredential.user;
+      setUser(newUser);
       setAuthed(true);
-      console.log("Logged in:", user);
+      setEmail("");
+      setPassword("");
+      console.log("Logged in:", newUser);
+      navigate("/customer");
     } catch (error) {
       setError("Invalid email or password");
       console.error("Error code:", error.code, "Message:", error.message);
@@ -120,12 +146,31 @@ function App() {
     }
   };
 
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      await signOut(auth);
+      setUser(null);
+      setAuthed(false);
+      setEmail("");
+      setPassword("");
+      setError("");
+      navigate("/");
+      console.log("Logged out successfully");
+    } catch (error) {
+      setError("Failed to log out");
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleKeyDown = (e) => {
-    if (e.key === "Enter") handleSignUp();
+    if (e.key === "Enter") handleSignUp(e);
   };
 
   const handleKeyDownLogin = (e) => {
-    if (e.key === "Enter") handleLogin();
+    if (e.key === "Enter") handleLogin(e);
   };
   return (
     <Routes>
@@ -133,23 +178,38 @@ function App() {
       <Route
         path="/customer"
         element={
-          <Customer
-            menuItems={menuItems}
-            cartItems={cartItems}
-            setCartItems={setCartItems}
-            cartOpen={cartOpen}
-            setCartOpen={setCartOpen}
-            toast={toast}
-            setToast={setToast}
-            successOrder={successOrder}
-            setSuccessOrder={setSuccessOrder}
-            handleAdd={handleAdd}
-            handleRemove={handleRemove}
-            handleUpdateQty={handleUpdateQty}
-            handleCheckout={handleCheckout}
-            handlePlaceOrder={handlePlaceOrder}
-            authed={authed}
-          />
+          authed && !authLoading ? (
+            <Customer
+              menuItems={menuItems}
+              cartItems={cartItems}
+              setCartItems={setCartItems}
+              cartOpen={cartOpen}
+              setCartOpen={setCartOpen}
+              toast={toast}
+              setToast={setToast}
+              successOrder={successOrder}
+              setSuccessOrder={setSuccessOrder}
+              handleAdd={handleAdd}
+              handleRemove={handleRemove}
+              handleUpdateQty={handleUpdateQty}
+              handleCheckout={handleCheckout}
+              handlePlaceOrder={handlePlaceOrder}
+              authed={authed}
+              user={user}
+              handleLogout={handleLogout}
+            />
+          ) : !authLoading ? (
+            <div style={{ textAlign: "center", paddingTop: "50px" }}>
+              <h2>Please log in to access the customer page</h2>
+              <p>
+                <a href="/Login">Go to Login</a>
+              </p>
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", paddingTop: "50px" }}>
+              <h2>Loading...</h2>
+            </div>
+          )
         }
       />
       <Route

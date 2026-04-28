@@ -45,6 +45,8 @@ function Customer({
   handleCheckout,
   toast,
   authed,
+  user,
+  handleLogout,
 }) {
   const MENU = (menuItems || []).filter((item) => item.available);
   const CATEGORIES = [
@@ -68,6 +70,8 @@ function Customer({
         cartCount={cartItems.reduce((s, i) => s + i.qty, 0)}
         onCartClick={() => setCartOpen(true)}
         T={T}
+        user={user}
+        handleLogout={handleLogout}
       />
       <Hero T={T} />
       <MenuSection
