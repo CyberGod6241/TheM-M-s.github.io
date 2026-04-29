@@ -7,8 +7,8 @@ import { Input, Btn } from "../components/ui";
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error,    setError]    = useState("");
-  const [loading,  setLoading]  = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
     setError("");
@@ -41,18 +41,20 @@ export default function Login({ onLogin }) {
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         {[
           { w: 280, top: "15%", left: "80%", opacity: 0.12 },
-          { w: 200, top: "70%", left: "5%",  opacity: 0.08 },
+          { w: 200, top: "70%", left: "5%", opacity: 0.08 },
         ].map((b, i) => (
           <div
             key={i}
             className="absolute rounded-full"
             style={{
-              width:     b.w, height: b.w,
-              top:       b.top, left: b.left,
+              width: b.w,
+              height: b.w,
+              top: b.top,
+              left: b.left,
               transform: "translate(-50%,-50%)",
               background: T.orange,
-              opacity:   b.opacity,
-              filter:    "blur(72px)",
+              opacity: b.opacity,
+              filter: "blur(72px)",
             }}
           />
         ))}
@@ -64,7 +66,7 @@ export default function Login({ onLogin }) {
           <h1
             className="text-5xl font-black mb-1"
             style={{
-              color:      T.orange,
+              color: T.orange,
               fontFamily: "'Georgia',serif",
               textShadow: `0 0 60px ${T.orange}50`,
             }}
@@ -116,9 +118,8 @@ export default function Login({ onLogin }) {
           </Btn>
 
           <p className="text-xs text-center mt-4" style={{ color: T.muted }}>
-            Demo:{" "}
+            Demo:
             <span style={{ color: T.orange }}>admin</span>
-            {" / "}
             <span style={{ color: T.orange }}>kumchop2025</span>
           </p>
         </div>
