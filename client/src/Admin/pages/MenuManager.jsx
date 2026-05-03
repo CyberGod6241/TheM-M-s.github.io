@@ -5,6 +5,11 @@ import { T } from "../constants/theme";
 import { MENU_CATEGORIES, BLANK_MENU_ITEM } from "../constants/data";
 import { fmt } from "../utils/helpers";
 import { Btn, Input, Select } from "../components/ui";
+import {
+  createMenuItem,
+  updateMenuItem,
+  deleteMenuItem,
+} from "../../utils/api";
 
 // ── Edit / Add modal ──────────────────────────────────────────────────────────
 function MenuItemModal({ item, isNew, onSave, onClose }) {
@@ -185,7 +190,7 @@ export default function MenuManager({ items, onSave, showToast }) {
     setIsNew(false);
   };
 
-  const saveItem = (item) => {
+  const saveItem = async (item) => {
     if (!item.name.trim()) {
       showToast("Name is required", "error");
       return;
@@ -195,38 +200,79 @@ export default function MenuManager({ items, onSave, showToast }) {
       return;
     }
 
-    const next = isNew
-      ? [...menu, { ...item, id: Date.now() }]
-      : menu.map((m) => (m.id === item.id ? item : m));
-
-    setMenu(next);
-    onSave(next);
-    setEditing(null);
-    showToast(isNew ? "✅ Item added!" : "✅ Item updated!", "success");
+    try {
+      if (isNew) {
+        // Create new item via API
+        await createMenuItem({
+          name: item.name,
+          emoji: item.emoji,
+          category: item.category,
+          unitPrice: item.unitPrice,
+          unitLabel: item.unitLabel,
+          img: item.img,
+          available: item.available !== false,
+        });
+        const next = [...menu, { ...item, id: Date.now() }];
+        setMenu(next);
+        onSave(next);
+        showToast("✅ Item added!", "success");
+      } else {
+        // Update existing item via API
+        await updateMenuItem(item.id, {
+          name: item.name,
+          emoji: item.emoji,
+          category: item.category,
+          unitPrice: item.unitPrice,
+          unitLabel: item.unitLabel,
+          img: item.img,
+          available: item.available,
+        });
+        const next = menu.map((m) => (m.id === item.id ? item : m));
+        setMenu(next);
+        onSave(next);
+        showToast("✅ Item updated!", "success");
+      }
+      setEditing(null);
+    } catch (error) {
+      console.error("Failed to save item:", error);
+      showToast("❌ Failed to save item", "error");
+    }
   };
 
-  const toggleAvail = (id) => {
-    const next = menu.map((m) =>
-      m.id === id ? { ...m, available: !m.available } : m,
-    );
-    setMenu(next);
-    onSave(next);
-    updateItems();
+  const toggleAvail = async (id) => {
+    const item = menu.find((m) => m.id === id);
+    if (!item) return;
+
+    try {
+      await updateMenuItem(id, {
+        ...item,
+        available: !item.available,
+      });
+      const next = menu.map((m) =>
+        m.id === id ? { ...m, available: !m.available } : m,
+      );
+      setMenu(next);
+      onSave(next);
+    } catch (error) {
+      console.error("Failed to toggle availability:", error);
+      showToast("❌ Failed to update item", "error");
+    }
   };
 
-  const deleteItem = (id) => {
+  const deleteItem = async (id) => {
     if (!window.confirm("Delete this menu item?")) return;
-    const next = menu.filter((m) => m.id !== id);
-    setMenu(next);
-    onSave(next);
-    updateItems();
-    showToast("🗑 Item deleted", "info");
-  };
 
-  const updateItems = () => {
-    onSave(menu);
+    try {
+      await deleteMenuItem(id);
+      const next = menu.filter((m) => m.id !== id);
+      setMenu(next);
+      onSave(next);
+      showToast("🗑 Item deleted", "info");
+    } catch (error) {
+      console.error("Failed to delete item:", error);
+      showToast("❌ Failed to delete item", "error");
+    }
   };
-  console.log(menu);
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (

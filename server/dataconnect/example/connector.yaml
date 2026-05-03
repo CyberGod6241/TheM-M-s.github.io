@@ -7,3 +7,6 @@ generate:
       react: false
       angular: false
       clientCache: {}
+
+# Operations for the food ordering app
+operations: ./operations.gql

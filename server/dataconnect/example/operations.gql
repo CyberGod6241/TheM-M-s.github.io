@@ -1,0 +1,88 @@
+query listMenuItems @auth(level: PUBLIC) {
+  menuItems(
+    where: { isAvailable: { eq: true } }
+    orderBy: [{ category: ASC }, { name: ASC }]
+  ) {
+    id
+    name
+    description
+    price
+    category
+    imageUrl
+    isAvailable
+  }
+}
+
+query getUserOrders($userId: UUID!) @auth(level: USER) {
+  orders(
+    where: { customer: { id: { eq: $userId } } }
+    orderBy: [{ createdAt: DESC }]
+  ) {
+    id
+    orderDate
+    totalAmount
+    status
+    orderType
+    deliveryAddress
+    deliveryFee
+    customer {
+      id
+      displayName
+      email
+    }
+  }
+}
+
+query getOrderItems($orderId: UUID!) @auth(level: USER) {
+  orderItems(where: { order: { id: { eq: $orderId } } }) {
+    id
+    quantity
+    subtotal
+    menuItem {
+      id
+      name
+      price
+    }
+    specialInstructions
+  }
+}
+
+mutation createOrder(
+  $orderDate: Date!
+  $totalAmount: Float!
+  $status: String!
+  $orderType: String!
+  $restaurantId: UUID!
+  $deliveryAddress: String
+  $deliveryFee: Float
+) @auth(level: USER) {
+  order_insert(
+    data: {
+      orderDate: $orderDate
+      totalAmount: $totalAmount
+      status: $status
+      orderType: $orderType
+      restaurant: { id: $restaurantId }
+      deliveryAddress: $deliveryAddress
+      deliveryFee: $deliveryFee
+    }
+  )
+}
+
+mutation createOrderItem(
+  $orderId: UUID!
+  $menuItemId: UUID!
+  $quantity: Int!
+  $subtotal: Float!
+  $specialInstructions: String
+) @auth(level: USER) {
+  orderItem_insert(
+    data: {
+      order: { id: $orderId }
+      menuItem: { id: $menuItemId }
+      quantity: $quantity
+      subtotal: $subtotal
+      specialInstructions: $specialInstructions
+    }
+  )
+}

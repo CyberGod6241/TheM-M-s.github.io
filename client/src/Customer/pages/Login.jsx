@@ -55,9 +55,9 @@ export default function Login({
           >
             Kumchop
           </h1>
-          <p className="text-xs italic" style={{ color: "#f9a96a" }}>
+          {/* <p className="text-xs italic" style={{ color: "#f9a96a" }}>
             User Dashboard
-          </p>
+          </p> */}
         </div>
 
         {/* Card */}

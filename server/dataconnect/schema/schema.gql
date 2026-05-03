@@ -10,7 +10,7 @@ type Restaurant @table {
   name: String!
   address: String!
   phone: String!
-  createdAt: Timestamp!
+  createdAt: Timestamp
   owner: User
   cuisineType: String
   description: String
@@ -21,7 +21,7 @@ type MenuItem @table {
   name: String!
   price: Float!
   category: String!
-  createdAt: Timestamp!
+  createdAt: Timestamp
   restaurant: Restaurant
   description: String
   imageUrl: String
@@ -33,7 +33,7 @@ type Order @table {
   totalAmount: Float!
   status: String!
   orderType: String!
-  createdAt: Timestamp!
+  createdAt: Timestamp
   customer: User
   restaurant: Restaurant
   deliveryAddress: String
@@ -43,7 +43,7 @@ type Order @table {
 type OrderItem @table {
   quantity: Int!
   subtotal: Float!
-  createdAt: Timestamp!
+  createdAt: Timestamp
   order: Order
   menuItem: MenuItem
   specialInstructions: String

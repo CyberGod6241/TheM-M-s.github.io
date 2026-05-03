@@ -5,6 +5,7 @@ import ViewOrder from "./Dashboard/ViewOrder";
 import Admin from "./Dashboard/Admin";
 import Login from "./Customer/pages/Login";
 import SignUp from "./Customer/pages/SignUp";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { SEED_MENU } from "./Admin/constants/data";
@@ -16,6 +17,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from "firebase/auth";
+import { syncUser, getMenuItems, placeOrder, getUserRole } from "./utils/api";
 
 function App() {
   const navigate = useNavigate();
@@ -67,12 +69,41 @@ function App() {
     document.getElementById("order")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handlePlaceOrder = (form) => {
-    const total = cartItems.reduce((s, i) => s + i.price, 0);
-    setSuccessOrder({ ...form, items: cartItems, total });
-    setCartItems([]);
+  const handlePlaceOrder = async (form) => {
+    try {
+      const items = cartItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.qty,
+        unitPrice: item.unitPrice,
+        subtotal: item.price,
+      }));
+      const total = cartItems.reduce((s, i) => s + i.price, 0);
+
+      // Call new placeOrder API with Firebase ID token
+      const orderResponse = await placeOrder({
+        items,
+        total,
+        orderType: form.deliveryType === "delivery" ? "delivery" : "pickup",
+        deliveryAddress: form.deliveryType === "delivery" ? form.address : null,
+        phone: form.phone,
+        note: form.note || null,
+      });
+
+      setSuccessOrder({
+        ...form,
+        items: cartItems,
+        total,
+        orderId: orderResponse.id || orderResponse.orderId,
+      });
+      setCartItems([]);
+      showToast("✅ Order placed successfully!");
+    } catch (error) {
+      console.error("Failed to place order:", error);
+      showToast("❌ Failed to place order. Please try again.");
+    }
   };
-  // ── Auth for Customers ──────────────────────────────────────────────────────────────────
+  // ── Auth for Customers/Admin ──────────────────────────────────────────────────────────────────
   const [authed, setAuthed] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [password, setPassword] = useState("");
@@ -80,21 +111,51 @@ function App() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState("customer");
 
   // ── Persist auth state across page refreshes ──────────────────────────────────────
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
         setAuthed(true);
+
+        // Fetch user role from backend
+        try {
+          const role = await getUserRole();
+          setUserRole(role || "customer");
+        } catch (error) {
+          console.error("Failed to fetch user role:", error);
+          setUserRole("customer");
+        }
       } else {
         setUser(null);
         setAuthed(false);
+        setUserRole("customer");
       }
       setAuthLoading(false);
     });
 
     return () => unsubscribe();
+  }, []);
+
+  // ── Load menu items from backend API ────────────────────────────────
+  useEffect(() => {
+    const loadMenu = async () => {
+      try {
+        const response = await getMenuItems();
+        // Handle both array and object response formats
+        const menuData = Array.isArray(response)
+          ? response
+          : response.menu || response.data || [];
+        setMenuItems(menuData.length > 0 ? menuData : SEED_MENU);
+      } catch (error) {
+        console.error("Failed to load menu from API:", error);
+        // Fallback to seed data
+        setMenuItems(SEED_MENU);
+      }
+    };
+    loadMenu();
   }, []);
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -112,6 +173,10 @@ function App() {
       setEmail("");
       setPassword("");
       console.log("Signed up:", newUser);
+
+      // Sync user to backend
+      await syncUser();
+
       navigate("/customer");
     } catch (error) {
       setError("Failed to sign up: " + error.message);
@@ -137,6 +202,10 @@ function App() {
       setEmail("");
       setPassword("");
       console.log("Logged in:", newUser);
+
+      // Sync user to backend
+      await syncUser();
+
       navigate("/customer");
     } catch (error) {
       setError("Invalid email or password");
@@ -225,7 +294,15 @@ function App() {
       />
       <Route
         path="/admin"
-        element={<Admin menuItems={menuItems} setMenuItems={setMenuItems} />}
+        element={
+          <ProtectedRoute
+            userRole={userRole}
+            authed={authed}
+            isLoading={authLoading}
+          >
+            <Admin menuItems={menuItems} setMenuItems={setMenuItems} />
+          </ProtectedRoute>
+        }
       />
       <Route path="/view-order" element={<ViewOrder />} />
       <Route

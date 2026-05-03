@@ -1,7 +1,7 @@
 // ─── APP ROOT ────────────────────────────────────────────────────────────────
 // Wires together all pages, the sidebar, global state, and the toast system.
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { T } from "../Admin/constants/theme";
 import { SEED_ORDERS } from "../Admin/constants/data";
@@ -15,6 +15,10 @@ import Orders from "../Admin/pages/Orders";
 import MenuManager from "../Admin/pages/MenuManager";
 import Analytics from "../Admin/pages/Analytics";
 import Settings from "../Admin/pages/Settings";
+import {
+  getAllOrders,
+  updateOrderStatus as updateOrderStatusAPI,
+} from "../utils/api";
 
 function Admin({ menuItems, setMenuItems }) {
   // ── Auth ──────────────────────────────────────────────────────────────────
@@ -26,6 +30,27 @@ function Admin({ menuItems, setMenuItems }) {
 
   // ── Global data ───────────────────────────────────────────────────────────
   const [orders, setOrders] = useState(SEED_ORDERS);
+
+  // Fetch orders on mount
+  useEffect(() => {
+    if (!authed) return;
+
+    const loadOrders = async () => {
+      try {
+        const fetchedOrders = await getAllOrders();
+        // Handle different response formats
+        const ordersData = Array.isArray(fetchedOrders)
+          ? fetchedOrders
+          : fetchedOrders.data || fetchedOrders.orders || [];
+        setOrders(ordersData.length > 0 ? ordersData : SEED_ORDERS);
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        setOrders(SEED_ORDERS);
+      }
+    };
+
+    loadOrders();
+  }, [authed]);
 
   // ── Toast system ──────────────────────────────────────────────────────────
   const [toast, setToast] = useState({ msg: "", type: "info", visible: false });
@@ -41,11 +66,19 @@ function Admin({ menuItems, setMenuItems }) {
   };
 
   // ── Order status handler ──────────────────────────────────────────────────
-  // Replace the setOrders call with your API call in production:
-  //   await fetch(`/api/orders/${id}/status`, { method:"PATCH", body:... })
-  const updateOrderStatus = (id, status) => {
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
-    showToast(`Order ${id} → ${status}`, "success");
+  const updateOrderStatus = async (id, status) => {
+    try {
+      // Call API to update status
+      await updateOrderStatusAPI(id, status);
+      // Update local state
+      setOrders((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, status } : o)),
+      );
+      showToast(`Order ${id} → ${status}`, "success");
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      showToast("Failed to update order status", "error");
+    }
   };
 
   const pendingCount = orders.filter((o) => o.status === "Pending").length;

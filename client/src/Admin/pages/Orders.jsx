@@ -9,10 +9,16 @@ import { Badge, Btn } from "../components/ui";
 // ── Order detail modal ────────────────────────────────────────────────────────
 function OrderModal({ order, onClose, onUpdateStatus }) {
   const [current, setCurrent] = useState(order);
+  const [updating, setUpdating] = useState(false);
 
-  const handleStatus = (newStatus) => {
-    onUpdateStatus(current.id, newStatus);
-    setCurrent((prev) => ({ ...prev, status: newStatus }));
+  const handleStatus = async (newStatus) => {
+    setUpdating(true);
+    try {
+      await onUpdateStatus(current.id, newStatus);
+      setCurrent((prev) => ({ ...prev, status: newStatus }));
+    } finally {
+      setUpdating(false);
+    }
   };
 
   return (
@@ -30,8 +36,8 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
           className="w-full max-w-lg rounded-3xl overflow-hidden flex flex-col"
           style={{
             background: T.surface,
-            border:     `1px solid ${T.borderHi}`,
-            maxHeight:  "90vh",
+            border: `1px solid ${T.borderHi}`,
+            maxHeight: "90vh",
           }}
         >
           {/* Header */}
@@ -53,14 +59,14 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
             <button
               onClick={onClose}
               style={{
-                background:   `${T.orange}18`,
-                border:       "none",
-                color:        T.orange,
-                width:        32,
-                height:       32,
+                background: `${T.orange}18`,
+                border: "none",
+                color: T.orange,
+                width: 32,
+                height: 32,
                 borderRadius: "50%",
-                cursor:       "pointer",
-                fontSize:     16,
+                cursor: "pointer",
+                fontSize: 16,
               }}
             >
               ✕
@@ -73,17 +79,21 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
             <div className="grid grid-cols-2 gap-3">
               {[
                 { l: "Customer", v: current.customer },
-                { l: "Phone",    v: current.phone    },
-                { l: "Type",     v: current.type     },
-                { l: "Note",     v: current.note || "—" },
+                { l: "Phone", v: current.phone },
+                { l: "Type", v: current.type },
+                { l: "Note", v: current.note || "—" },
               ].map((r) => (
                 <div
                   key={r.l}
                   className="p-3 rounded-xl"
                   style={{ background: "rgba(255,255,255,.03)" }}
                 >
-                  <p className="text-xs" style={{ color: T.muted }}>{r.l}</p>
-                  <p className="text-sm font-semibold text-white mt-0.5">{r.v}</p>
+                  <p className="text-xs" style={{ color: T.muted }}>
+                    {r.l}
+                  </p>
+                  <p className="text-sm font-semibold text-white mt-0.5">
+                    {r.v}
+                  </p>
                 </div>
               ))}
             </div>
@@ -93,7 +103,9 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
                 className="p-3 rounded-xl"
                 style={{ background: "rgba(255,255,255,.03)" }}
               >
-                <p className="text-xs" style={{ color: T.muted }}>Address</p>
+                <p className="text-xs" style={{ color: T.muted }}>
+                  Address
+                </p>
                 <p className="text-sm text-white mt-0.5">{current.address}</p>
               </div>
             )}
@@ -115,12 +127,17 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
                   >
                     <span className="text-xl">{it.emoji}</span>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-white">{it.name}</p>
+                      <p className="text-sm font-semibold text-white">
+                        {it.name}
+                      </p>
                       <p className="text-xs" style={{ color: T.muted }}>
                         {fmt(it.unitPrice)} × {it.qty} {it.unitLabel}s
                       </p>
                     </div>
-                    <p className="font-bold text-sm" style={{ color: T.orange }}>
+                    <p
+                      className="font-bold text-sm"
+                      style={{ color: T.orange }}
+                    >
                       {fmt(it.price)}
                     </p>
                   </div>
@@ -152,21 +169,22 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
               </p>
               <div className="flex flex-wrap gap-2">
                 {STATUSES.map((s) => {
-                  const c      = statusColor(s);
+                  const c = statusColor(s);
                   const active = current.status === s;
                   return (
                     <button
                       key={s}
                       onClick={() => handleStatus(s)}
-                      className="px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 hover:scale-105"
+                      disabled={updating}
+                      className="px-3 py-1.5 rounded-full text-xs font-bold transition-all duration-150 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
                         background: active ? c.text : c.bg,
-                        color:      active ? "#fff" : c.text,
-                        border:     `1px solid ${c.text}40`,
-                        cursor:     "pointer",
+                        color: active ? "#fff" : c.text,
+                        border: `1px solid ${c.text}40`,
+                        cursor: updating ? "not-allowed" : "pointer",
                       }}
                     >
-                      {s}
+                      {updating && current.status === s ? "..." : s}
                     </button>
                   );
                 })}
@@ -181,11 +199,11 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
 
 // ── Orders page ───────────────────────────────────────────────────────────────
 export default function Orders({ orders, onUpdateStatus }) {
-  const [search,       setSearch]       = useState("");
+  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [typeFilter,   setTypeFilter]   = useState("All");
-  const [selected,     setSelected]     = useState(null);
-  const [page,         setPage]         = useState(0);
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [selected, setSelected] = useState(null);
+  const [page, setPage] = useState(0);
 
   const PER_PAGE = 8;
 
@@ -195,7 +213,7 @@ export default function Orders({ orders, onUpdateStatus }) {
       o.customer.toLowerCase().includes(search.toLowerCase()) ||
       o.phone.includes(search);
     const matchStatus = statusFilter === "All" || o.status === statusFilter;
-    const matchType   = typeFilter   === "All" || o.type   === typeFilter;
+    const matchType = typeFilter === "All" || o.type === typeFilter;
     return matchSearch && matchStatus && matchType;
   });
 
@@ -223,24 +241,48 @@ export default function Orders({ orders, onUpdateStatus }) {
           type="text"
           placeholder="Search by order ID, name or phone…"
           value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(0);
+          }}
           className="flex-1 min-w-48 px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: T.card, border: `1px solid ${T.border}`, color: T.text, fontFamily: "inherit" }}
+          style={{
+            background: T.card,
+            border: `1px solid ${T.border}`,
+            color: T.text,
+            fontFamily: "inherit",
+          }}
         />
         <select
           value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
+          onChange={(e) => {
+            setStatusFilter(e.target.value);
+            setPage(0);
+          }}
           className="px-3 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: T.card, border: `1px solid ${T.border}`, color: T.text }}
+          style={{
+            background: T.card,
+            border: `1px solid ${T.border}`,
+            color: T.text,
+          }}
         >
           <option value="All">All Statuses</option>
-          {STATUSES.map((s) => <option key={s}>{s}</option>)}
+          {STATUSES.map((s) => (
+            <option key={s}>{s}</option>
+          ))}
         </select>
         <select
           value={typeFilter}
-          onChange={(e) => { setTypeFilter(e.target.value); setPage(0); }}
+          onChange={(e) => {
+            setTypeFilter(e.target.value);
+            setPage(0);
+          }}
           className="px-3 py-2.5 rounded-xl text-sm outline-none"
-          style={{ background: T.card, border: `1px solid ${T.border}`, color: T.text }}
+          style={{
+            background: T.card,
+            border: `1px solid ${T.border}`,
+            color: T.text,
+          }}
         >
           <option value="All">All Types</option>
           <option>Delivery</option>
@@ -251,18 +293,21 @@ export default function Orders({ orders, onUpdateStatus }) {
       {/* Status pill quick-filters */}
       <div className="flex flex-wrap gap-2">
         {["All", ...STATUSES].map((s) => {
-          const c      = s === "All" ? { text: T.orange } : statusColor(s);
+          const c = s === "All" ? { text: T.orange } : statusColor(s);
           const active = statusFilter === s;
           return (
             <button
               key={s}
-              onClick={() => { setStatusFilter(s); setPage(0); }}
+              onClick={() => {
+                setStatusFilter(s);
+                setPage(0);
+              }}
               className="px-3 py-1 rounded-full text-xs font-semibold transition-all duration-150"
               style={{
                 background: active ? c.text : "rgba(255,255,255,.05)",
-                color:      active ? "#fff" : c.text,
-                border:     `1px solid ${active ? "transparent" : c.text + "40"}`,
-                cursor:     "pointer",
+                color: active ? "#fff" : c.text,
+                border: `1px solid ${active ? "transparent" : c.text + "40"}`,
+                cursor: "pointer",
               }}
             >
               {s}
@@ -298,11 +343,11 @@ export default function Orders({ orders, onUpdateStatus }) {
             style={{ background: T.card, border: `1px solid ${T.border}` }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = T.orange + "50";
-              e.currentTarget.style.background  = "rgba(249,115,22,.05)";
+              e.currentTarget.style.background = "rgba(249,115,22,.05)";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = T.border;
-              e.currentTarget.style.background  = T.card;
+              e.currentTarget.style.background = T.card;
             }}
           >
             {/* Top row: avatar + name + status badge */}
@@ -318,7 +363,9 @@ export default function Orders({ orders, onUpdateStatus }) {
                   <p className="font-bold text-white text-sm leading-tight">
                     {o.customer}
                   </p>
-                  <p className="text-xs" style={{ color: T.muted }}>{o.phone}</p>
+                  <p className="text-xs" style={{ color: T.muted }}>
+                    {o.phone}
+                  </p>
                 </div>
               </div>
               <Badge label={o.status} />
@@ -335,8 +382,11 @@ export default function Orders({ orders, onUpdateStatus }) {
               <span
                 className="text-xs px-2 py-1 rounded-lg"
                 style={{
-                  background: o.type === "Delivery" ? "rgba(59,130,246,.12)" : "rgba(168,85,247,.12)",
-                  color:      o.type === "Delivery" ? T.blue : "#a855f7",
+                  background:
+                    o.type === "Delivery"
+                      ? "rgba(59,130,246,.12)"
+                      : "rgba(168,85,247,.12)",
+                  color: o.type === "Delivery" ? T.blue : "#a855f7",
                 }}
               >
                 {o.type === "Delivery" ? "🛵" : "🏪"} {o.type}
@@ -355,7 +405,10 @@ export default function Orders({ orders, onUpdateStatus }) {
                 <span
                   key={i}
                   className="text-xs px-2 py-0.5 rounded-full"
-                  style={{ background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.6)" }}
+                  style={{
+                    background: "rgba(255,255,255,.06)",
+                    color: "rgba(255,255,255,.6)",
+                  }}
                 >
                   {it.emoji} {it.name} ×{it.qty}
                 </span>
@@ -363,7 +416,10 @@ export default function Orders({ orders, onUpdateStatus }) {
               {o.items.length > 4 && (
                 <span
                   className="text-xs px-2 py-0.5 rounded-full"
-                  style={{ background: "rgba(255,255,255,.06)", color: T.muted }}
+                  style={{
+                    background: "rgba(255,255,255,.06)",
+                    color: T.muted,
+                  }}
                 >
                   +{o.items.length - 4} more
                 </span>
@@ -376,7 +432,9 @@ export default function Orders({ orders, onUpdateStatus }) {
               style={{ borderTop: `1px solid rgba(255,255,255,.06)` }}
             >
               <div>
-                <p className="text-xs" style={{ color: T.muted }}>Order Total</p>
+                <p className="text-xs" style={{ color: T.muted }}>
+                  Order Total
+                </p>
                 <p
                   className="font-black text-lg leading-tight"
                   style={{ color: T.orange, fontFamily: "'Georgia',serif" }}
@@ -387,37 +445,45 @@ export default function Orders({ orders, onUpdateStatus }) {
 
               <div className="flex items-center gap-2">
                 {/* One-click status advance */}
-                {o.status !== "Delivered" && o.status !== "Cancelled" && (() => {
-                  const nextIdx = STATUSES.indexOf(o.status) + 1;
-                  const next    = STATUSES[nextIdx];
-                  if (!next || next === "Cancelled") return null;
-                  const nc = statusColor(next);
-                  return (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); onUpdateStatus(o.id, next); }}
-                      className="px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 hover:scale-105"
-                      style={{
-                        background: nc.bg,
-                        color:      nc.text,
-                        border:     `1px solid ${nc.text}40`,
-                        cursor:     "pointer",
-                      }}
-                    >
-                      → {next}
-                    </button>
-                  );
-                })()}
+                {o.status !== "Delivered" &&
+                  o.status !== "Cancelled" &&
+                  (() => {
+                    const nextIdx = STATUSES.indexOf(o.status) + 1;
+                    const next = STATUSES[nextIdx];
+                    if (!next || next === "Cancelled") return null;
+                    const nc = statusColor(next);
+                    return (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onUpdateStatus(o.id, next);
+                        }}
+                        className="px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 hover:scale-105"
+                        style={{
+                          background: nc.bg,
+                          color: nc.text,
+                          border: `1px solid ${nc.text}40`,
+                          cursor: "pointer",
+                        }}
+                      >
+                        → {next}
+                      </button>
+                    );
+                  })()}
 
                 {/* View details — always visible */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); setSelected(o); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelected(o);
+                  }}
                   className="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-150 hover:scale-105"
                   style={{
                     background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
-                    color:      "#fff",
-                    border:     "none",
-                    cursor:     "pointer",
-                    boxShadow:  `0 2px 12px ${T.orange}40`,
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: `0 2px 12px ${T.orange}40`,
                   }}
                 >
                   View Details →
@@ -435,8 +501,24 @@ export default function Orders({ orders, onUpdateStatus }) {
             Page {page + 1} of {pages} · {filtered.length} orders
           </span>
           <div className="flex gap-2">
-            <Btn small variant="outline" onClick={() => setPage((p) => Math.max(0, p - 1))}         disabled={page === 0}>         ← Prev</Btn>
-            <Btn small variant="outline" onClick={() => setPage((p) => Math.min(pages - 1, p + 1))} disabled={page === pages - 1}> Next →</Btn>
+            <Btn
+              small
+              variant="outline"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+            >
+              {" "}
+              ← Prev
+            </Btn>
+            <Btn
+              small
+              variant="outline"
+              onClick={() => setPage((p) => Math.min(pages - 1, p + 1))}
+              disabled={page === pages - 1}
+            >
+              {" "}
+              Next →
+            </Btn>
           </div>
         </div>
       )}
