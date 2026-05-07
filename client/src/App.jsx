@@ -8,7 +8,6 @@ import SignUp from "./Customer/pages/SignUp";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { SEED_MENU } from "./Admin/constants/data";
 
 import { auth } from "./authentication/firebase";
 import {
@@ -27,7 +26,17 @@ function App() {
   const [cartOpen, setCartOpen] = useState(false);
   const [toast, setToast] = useState({ msg: "", visible: false });
   const [successOrder, setSuccessOrder] = useState(null);
-  const [menuItems, setMenuItems] = useState(SEED_MENU);
+  const [menuItems, setMenuItems] = useState([]);
+
+  // ── Auth for Customers/Admin ──────────────────────────────────────────────────────────────────
+  const [authed, setAuthed] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState("customer");
 
   const showToast = (msg) => {
     setToast({ msg, visible: true });
@@ -103,15 +112,6 @@ function App() {
       showToast("❌ Failed to place order. Please try again.");
     }
   };
-  // ── Auth for Customers/Admin ──────────────────────────────────────────────────────────────────
-  const [authed, setAuthed] = useState(false);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const [userRole, setUserRole] = useState("customer");
 
   // ── Persist auth state across page refreshes ──────────────────────────────────────
   useEffect(() => {
@@ -148,11 +148,11 @@ function App() {
         const menuData = Array.isArray(response)
           ? response
           : response.menu || response.data || [];
-        setMenuItems(menuData.length > 0 ? menuData : SEED_MENU);
+        setMenuItems(menuData.length > 0 ? menuData : []);
       } catch (error) {
         console.error("Failed to load menu from API:", error);
-        // Fallback to seed data
-        setMenuItems(SEED_MENU);
+        // No fallback to seed data - show empty menu
+        setMenuItems([]);
       }
     };
     loadMenu();

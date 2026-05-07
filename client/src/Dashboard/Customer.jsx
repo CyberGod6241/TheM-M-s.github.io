@@ -1,9 +1,11 @@
-import Navbar from "../Customer/pages/Navbar";
+import { useState, useEffect } from "react";
+import CustomerSidebar from "../Admin/components/layouts/CustomerSidebar";
+import { Toast } from "../Admin/components/ui";
 import Hero from "../Customer/pages/Hero";
 import MenuSection from "../Customer/pages/MenuSection";
 import OrderSection from "./OrderSection";
-import Contact from "../Customer/pages/Contact";
-import Footer from "../Customer/pages/Footer";
+import ViewOrder from "./ViewOrder";
+import Notifications from "./Notifications";
 import CartPanel from "../Customer/pages/CartPanel";
 import SuccessModal from "../Customer/pages/SuccesModal";
 import MenuCard from "../Customer/pages/MenuCard";
@@ -11,9 +13,10 @@ import SignUp from "../Customer/pages/SignUp";
 
 import { T } from "../Customer/constant/theme";
 import { fmt } from "../Customer/utils/helpers";
+import { getUserOrders, getNotifications } from "../utils/api";
 
 // ─── TOAST ───────────────────────────────────────────────────────────────────
-function Toast({ msg, visible, T }) {
+function ToastComponent({ msg, visible, T }) {
   return (
     <div
       className="fixed bottom-6 right-6 z-50 transition-all duration-500"
@@ -48,43 +51,133 @@ function Customer({
   user,
   handleLogout,
 }) {
+  const [view, setView] = useState("dashboard");
+  const [collapsed, setCollapsed] = useState(false);
+  const [userOrders, setUserOrders] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  // ── Guard: show login if not authenticated ─────────────────────────────
+  if (!authed) return <SignUp />;
+
+  // Load user orders
+  useEffect(() => {
+    const loadUserOrders = async () => {
+      try {
+        const orders = await getUserOrders();
+        setUserOrders(Array.isArray(orders) ? orders : []);
+      } catch (error) {
+        console.error("Failed to load user orders:", error);
+        setUserOrders([]);
+      }
+    };
+    loadUserOrders();
+  }, []);
+
+  // Load notifications
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const notifs = await getNotifications();
+        setNotifications(Array.isArray(notifs) ? notifs : []);
+        setNotificationCount(notifs.filter((n) => !n.read).length);
+      } catch (error) {
+        console.error("Failed to load notifications:", error);
+        setNotifications([]);
+        setNotificationCount(0);
+      }
+    };
+    loadNotifications();
+  }, []);
+
   const MENU = (menuItems || []).filter((item) => item.available);
   const CATEGORIES = [
     "All",
     ...Array.from(new Set(MENU.map((m) => m.category))),
   ];
-  console.log(MENU);
 
-  // ── Guard: show login if not authenticated ─────────────────────────────
-  if (!authed) return <SignUp />;
-
+  // ── Main layout ───────────────────────────────────────────────────────────
   return (
     <div
+      className="flex min-h-screen"
       style={{
-        background: T.brown900,
-        minHeight: "100vh",
+        background: T.bg,
         fontFamily: "'DM Sans',system-ui,sans-serif",
+        color: T.text,
       }}
     >
-      <Navbar
-        cartCount={cartItems.reduce((s, i) => s + i.qty, 0)}
-        onCartClick={() => setCartOpen(true)}
-        T={T}
-        user={user}
-        handleLogout={handleLogout}
+      {/* Sidebar */}
+      <CustomerSidebar
+        active={view}
+        setActive={setView}
+        onLogout={handleLogout}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        notificationCount={notificationCount}
       />
-      <Hero T={T} />
-      <MenuSection
-        onAdd={handleAdd}
-        T={T}
-        MENU={MENU}
-        CATEGORIES={CATEGORIES}
-        fmt={fmt}
-        MenuCard={MenuCard}
-      />
-      <Contact T={T} />
-      <Footer T={T} />
 
+      {/* Main content area */}
+      <main className="flex-1 overflow-auto">
+        {/* Top bar */}
+        <div
+          className="sticky top-0 z-30 flex items-center justify-between px-6 py-4"
+          style={{
+            background: `${T.bg}ee`,
+            backdropFilter: "blur(12px)",
+            borderBottom: `1px solid ${T.border}`,
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <h1 className="font-semibold text-white capitalize">{view}</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-xs" style={{ color: T.muted }}>
+              {new Date().toLocaleDateString("en-NG", {
+                weekday: "short",
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </div>
+            {/* User avatar */}
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm"
+              style={{
+                background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+              }}
+            >
+              {user?.displayName?.[0] || user?.email?.[0] || "U"}
+            </div>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <div className="p-6">
+          {view === "dashboard" && (
+            <div>
+              <Hero T={T} />
+              <MenuSection
+                onAdd={handleAdd}
+                T={T}
+                MENU={MENU}
+                CATEGORIES={CATEGORIES}
+                fmt={fmt}
+                MenuCard={MenuCard}
+              />
+            </div>
+          )}
+          {view === "orders" && <ViewOrder orders={userOrders} />}
+          {view === "notifications" && (
+            <Notifications
+              notifications={notifications}
+              setNotifications={setNotifications}
+              setNotificationCount={setNotificationCount}
+            />
+          )}
+        </div>
+      </main>
+
+      {/* Cart Panel */}
       {cartOpen && (
         <CartPanel
           items={cartItems}
@@ -97,7 +190,8 @@ function Customer({
         />
       )}
 
-      <Toast msg={toast.msg} visible={toast.visible} T={T} />
+      {/* Success Modal */}
+      <SuccessModal />
 
       {/* Floating cart FAB (mobile) */}
       {cartItems.length > 0 && !cartOpen && (
@@ -115,6 +209,8 @@ function Customer({
           {fmt(cartItems.reduce((s, i) => s + i.price, 0))}
         </button>
       )}
+
+      <ToastComponent msg={toast.msg} visible={toast.visible} T={T} />
     </div>
   );
 }

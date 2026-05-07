@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { T } from "../constants/theme";
 import { Btn } from "../components/ui";
+import { sendNotificationToAll } from "../../utils/api";
 
 // ── Reusable field wrapper ────────────────────────────────────────────────────
 function Field({ label, children }) {
@@ -21,10 +22,10 @@ function Field({ label, children }) {
 
 // Inline style shared by all settings inputs
 const INPUT_STYLE = {
-  background:  "rgba(59,20,0,.7)",
-  border:      `1px solid ${T.border}`,
-  color:       T.text,
-  fontFamily:  "inherit",
+  background: "rgba(59,20,0,.7)",
+  border: `1px solid ${T.border}`,
+  color: T.text,
+  fontFamily: "inherit",
 };
 
 function SettingsInput(props) {
@@ -80,28 +81,55 @@ function SettingsCard({ title, children }) {
 // ── Settings page ─────────────────────────────────────────────────────────────
 export default function Settings({ showToast }) {
   const [form, setForm] = useState({
-    restaurantName:  "Kumchop",
-    tagline:         "Every Taste feels Good.",
-    email:           "hello@kumchop.com",
-    phone1:          "08026875555",
-    phone2:          "0803 427 6312",
-    address:         "Ibadan, Oyo State, Nigeria",
-    openTime:        "08:00",
-    closeTime:       "22:00",
-    deliveryFee:     500,
-    minOrder:        1000,
-    acceptOrders:    true,
-    openSunday:      true,
-    notifyNewOrder:  true,
-    notifyLowStock:  false,
+    restaurantName: "Kumchop",
+    tagline: "Every Taste feels Good.",
+    email: "hello@kumchop.com",
+    phone1: "08026875555",
+    phone2: "0803 427 6312",
+    address: "Ibadan, Oyo State, Nigeria",
+    openTime: "08:00",
+    closeTime: "22:00",
+    deliveryFee: 500,
+    minOrder: 1000,
+    acceptOrders: true,
+    openSunday: true,
+    notifyNewOrder: true,
+    notifyLowStock: false,
+  });
+
+  const [notificationForm, setNotificationForm] = useState({
+    title: "",
+    message: "",
   });
 
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
-  const tog = (key)      => setForm((p) => ({ ...p, [key]: !p[key] }));
+  const tog = (key) => setForm((p) => ({ ...p, [key]: !p[key] }));
+
+  const setNotification = (key, val) =>
+    setNotificationForm((p) => ({ ...p, [key]: val }));
 
   const handleSave = () => {
     // In production: POST/PUT form to your API here.
     showToast("✅ Settings saved!", "success");
+  };
+
+  const handleSendNotification = async () => {
+    if (!notificationForm.title.trim() || !notificationForm.message.trim()) {
+      showToast("❌ Please fill in both title and message", "error");
+      return;
+    }
+
+    try {
+      await sendNotificationToAll(
+        notificationForm.title,
+        notificationForm.message,
+      );
+      showToast("✅ Notification sent to all users!", "success");
+      setNotificationForm({ title: "", message: "" });
+    } catch (error) {
+      console.error("Failed to send notification:", error);
+      showToast("❌ Failed to send notification", "error");
+    }
   };
 
   return (
@@ -124,25 +152,46 @@ export default function Settings({ showToast }) {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Field label="Restaurant Name">
-              <SettingsInput value={form.restaurantName} onChange={(e) => set("restaurantName", e.target.value)} />
+              <SettingsInput
+                value={form.restaurantName}
+                onChange={(e) => set("restaurantName", e.target.value)}
+              />
             </Field>
             <Field label="Tagline">
-              <SettingsInput value={form.tagline} onChange={(e) => set("tagline", e.target.value)} />
+              <SettingsInput
+                value={form.tagline}
+                onChange={(e) => set("tagline", e.target.value)}
+              />
             </Field>
           </div>
           <Field label="Email">
-            <SettingsInput type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
+            <SettingsInput
+              type="email"
+              value={form.email}
+              onChange={(e) => set("email", e.target.value)}
+            />
           </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Phone 1">
-              <SettingsInput type="tel" value={form.phone1} onChange={(e) => set("phone1", e.target.value)} />
+              <SettingsInput
+                type="tel"
+                value={form.phone1}
+                onChange={(e) => set("phone1", e.target.value)}
+              />
             </Field>
             <Field label="Phone 2">
-              <SettingsInput type="tel" value={form.phone2} onChange={(e) => set("phone2", e.target.value)} />
+              <SettingsInput
+                type="tel"
+                value={form.phone2}
+                onChange={(e) => set("phone2", e.target.value)}
+              />
             </Field>
           </div>
           <Field label="Address">
-            <SettingsInput value={form.address} onChange={(e) => set("address", e.target.value)} />
+            <SettingsInput
+              value={form.address}
+              onChange={(e) => set("address", e.target.value)}
+            />
           </Field>
         </div>
       </SettingsCard>
@@ -152,23 +201,55 @@ export default function Settings({ showToast }) {
         <div className="space-y-1">
           <div className="grid grid-cols-2 gap-4 mb-4">
             <Field label="Opening Time">
-              <SettingsInput type="time" value={form.openTime} onChange={(e) => set("openTime", e.target.value)} />
+              <SettingsInput
+                type="time"
+                value={form.openTime}
+                onChange={(e) => set("openTime", e.target.value)}
+              />
             </Field>
             <Field label="Closing Time">
-              <SettingsInput type="time" value={form.closeTime} onChange={(e) => set("closeTime", e.target.value)} />
+              <SettingsInput
+                type="time"
+                value={form.closeTime}
+                onChange={(e) => set("closeTime", e.target.value)}
+              />
             </Field>
             <Field label="Delivery Fee (₦)">
-              <SettingsInput type="number" value={form.deliveryFee} onChange={(e) => set("deliveryFee", Number(e.target.value))} />
+              <SettingsInput
+                type="number"
+                value={form.deliveryFee}
+                onChange={(e) => set("deliveryFee", Number(e.target.value))}
+              />
             </Field>
             <Field label="Min Order (₦)">
-              <SettingsInput type="number" value={form.minOrder} onChange={(e) => set("minOrder", Number(e.target.value))} />
+              <SettingsInput
+                type="number"
+                value={form.minOrder}
+                onChange={(e) => set("minOrder", Number(e.target.value))}
+              />
             </Field>
           </div>
 
-          <Toggle value={form.acceptOrders}   onChange={() => tog("acceptOrders")}   label="Accept new orders"   />
-          <Toggle value={form.openSunday}      onChange={() => tog("openSunday")}     label="Open on Sundays"     />
-          <Toggle value={form.notifyNewOrder}  onChange={() => tog("notifyNewOrder")} label="Notify on new order" />
-          <Toggle value={form.notifyLowStock}  onChange={() => tog("notifyLowStock")} label="Low stock alerts"    />
+          <Toggle
+            value={form.acceptOrders}
+            onChange={() => tog("acceptOrders")}
+            label="Accept new orders"
+          />
+          <Toggle
+            value={form.openSunday}
+            onChange={() => tog("openSunday")}
+            label="Open on Sundays"
+          />
+          <Toggle
+            value={form.notifyNewOrder}
+            onChange={() => tog("notifyNewOrder")}
+            label="Notify on new order"
+          />
+          <Toggle
+            value={form.notifyLowStock}
+            onChange={() => tog("notifyLowStock")}
+            label="Low stock alerts"
+          />
         </div>
       </SettingsCard>
 
@@ -182,6 +263,34 @@ export default function Settings({ showToast }) {
             <SettingsInput type="password" placeholder="••••••••" />
           </Field>
           <Btn variant="ghost">Change Password</Btn>
+        </div>
+      </SettingsCard>
+
+      {/* ── Send Notifications ── */}
+      <SettingsCard title="Send Notifications">
+        <div className="space-y-4">
+          <Field label="Notification Title">
+            <SettingsInput
+              value={notificationForm.title}
+              onChange={(e) => setNotification("title", e.target.value)}
+              placeholder="e.g., Order Update"
+            />
+          </Field>
+          <Field label="Message">
+            <textarea
+              value={notificationForm.message}
+              onChange={(e) => setNotification("message", e.target.value)}
+              placeholder="Enter your notification message..."
+              className="w-full px-4 py-2.5 rounded-xl text-sm outline-none resize-vertical"
+              style={{ ...INPUT_STYLE, minHeight: "80px" }}
+            />
+          </Field>
+          <Btn onClick={handleSendNotification} variant="primary">
+            📢 Send to All Users
+          </Btn>
+          <p className="text-xs" style={{ color: T.muted }}>
+            This will send a notification to all registered users.
+          </p>
         </div>
       </SettingsCard>
 

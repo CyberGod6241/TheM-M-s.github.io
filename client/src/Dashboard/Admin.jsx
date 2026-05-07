@@ -4,7 +4,6 @@
 import { useState, useRef, useEffect } from "react";
 
 import { T } from "../Admin/constants/theme";
-import { SEED_ORDERS } from "../Admin/constants/data";
 
 import Sidebar from "../Admin/components/layouts/Sidebar";
 import { Toast } from "../Admin/components/ui";
@@ -18,6 +17,7 @@ import Settings from "../Admin/pages/Settings";
 import {
   getAllOrders,
   updateOrderStatus as updateOrderStatusAPI,
+  sendNotificationToAll,
 } from "../utils/api";
 
 function Admin({ menuItems, setMenuItems }) {
@@ -42,10 +42,10 @@ function Admin({ menuItems, setMenuItems }) {
         const ordersData = Array.isArray(fetchedOrders)
           ? fetchedOrders
           : fetchedOrders.data || fetchedOrders.orders || [];
-        setOrders(ordersData.length > 0 ? ordersData : SEED_ORDERS);
+        setOrders(ordersData);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
-        setOrders(SEED_ORDERS);
+        setOrders([]);
       }
     };
 
@@ -74,6 +74,20 @@ function Admin({ menuItems, setMenuItems }) {
       setOrders((prev) =>
         prev.map((o) => (o.id === id ? { ...o, status } : o)),
       );
+
+      // Send notification to all users about order status update
+      const order = orders.find((o) => o.id === id);
+      if (order) {
+        const title = `Order Update`;
+        const message = `Your order #${id.slice(-8)} has been ${status.toLowerCase()}.`;
+        try {
+          await sendNotificationToAll(title, message);
+        } catch (notificationError) {
+          console.error("Failed to send notification:", notificationError);
+          // Don't fail the whole operation if notification fails
+        }
+      }
+
       showToast(`Order ${id} → ${status}`, "success");
     } catch (error) {
       console.error("Failed to update order status:", error);

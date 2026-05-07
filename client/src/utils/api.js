@@ -4,7 +4,7 @@ import { auth } from "../authentication/firebase";
 // HELPERS
 // ──────────────────────────────────────────────────────────────────────────────
 
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "http://localhost:5000/api";
 
 const getCurrentUserId = () => {
   const user = auth.currentUser;
@@ -278,6 +278,75 @@ export const syncUser = async (userData) => {
     return await response.json();
   } catch (error) {
     console.error("Error syncing user:", error);
+  }
+};
+
+/**
+ * Get user's notifications
+ */
+export const getNotifications = async () => {
+  try {
+    const userId = getCurrentUserId();
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE}/notifications?userId=${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) throw new Error("Failed to fetch notifications");
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    throw error;
+  }
+};
+
+/**
+ * Mark notification as read
+ */
+export const markNotificationRead = async (notificationId) => {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(
+      `${API_BASE}/notifications/${notificationId}/read`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    if (!response.ok) throw new Error("Failed to mark notification as read");
+    return await response.json();
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+    throw error;
+  }
+};
+
+/**
+ * Send notification to all users (Admin only)
+ */
+export const sendNotificationToAll = async (title, message) => {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE}/notifications/send-all`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ title, message }),
+    });
+    if (!response.ok) throw new Error("Failed to send notification");
+    return await response.json();
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    throw error;
   }
 };
 
