@@ -29,7 +29,7 @@ function Admin({ menuItems, setMenuItems }) {
   const [collapsed, setCollapsed] = useState(false);
 
   // ── Global data ───────────────────────────────────────────────────────────
-  const [orders, setOrders] = useState(SEED_ORDERS);
+  const [orders, setOrders] = useState([]);
 
   // Fetch orders on mount
   useEffect(() => {

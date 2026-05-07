@@ -57,9 +57,6 @@ function Customer({
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
 
-  // ── Guard: show login if not authenticated ─────────────────────────────
-  if (!authed) return <SignUp />;
-
   // Load user orders
   useEffect(() => {
     const loadUserOrders = async () => {
@@ -89,6 +86,9 @@ function Customer({
     };
     loadNotifications();
   }, []);
+
+  // ── Guard: show login if not authenticated ─────────────────────────────
+  if (!authed) return <SignUp />;
 
   const MENU = (menuItems || []).filter((item) => item.available);
   const CATEGORIES = [
