@@ -155,7 +155,7 @@ function Customer({
         <div className="p-6">
           {view === "dashboard" && (
             <div>
-              <Hero T={T} />
+              {/* <Hero T={T} /> */}
               <MenuSection
                 onAdd={handleAdd}
                 T={T}
