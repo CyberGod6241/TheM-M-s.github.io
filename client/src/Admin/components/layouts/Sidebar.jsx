@@ -1,13 +1,14 @@
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 
 import { T } from "../../constants/theme";
+import { Link } from "react-router-dom";
 
 const NAV = [
-  { id: "dashboard", icon: "⊞",  label: "Dashboard"  },
-  { id: "orders",    icon: "🧾", label: "Orders"      },
-  { id: "menu",      icon: "🍽️", label: "Menu"        },
-  { id: "analytics", icon: "📊", label: "Analytics"   },
-  { id: "settings",  icon: "⚙️", label: "Settings"    },
+  { id: "dashboard", icon: "⊞", label: "Dashboard" },
+  { id: "orders", icon: "🧾", label: "Orders" },
+  { id: "menu", icon: "🍽️", label: "Menu" },
+  { id: "analytics", icon: "📊", label: "Analytics" },
+  { id: "settings", icon: "⚙️", label: "Settings" },
 ];
 
 export default function Sidebar({
@@ -22,12 +23,12 @@ export default function Sidebar({
     <aside
       className="flex flex-col shrink-0 transition-all duration-300"
       style={{
-        width:       collapsed ? 68 : 220,
-        background:  T.surface,
+        width: collapsed ? 68 : 220,
+        background: T.surface,
         borderRight: `1px solid ${T.border}`,
-        height:      "100vh",
-        position:    "sticky",
-        top:         0,
+        height: "100vh",
+        position: "sticky",
+        top: 0,
       }}
     >
       {/* ── Logo ── */}
@@ -39,7 +40,7 @@ export default function Sidebar({
           className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-black text-white"
           style={{
             background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
-            fontSize:   "1rem",
+            fontSize: "1rem",
           }}
         >
           K
@@ -63,7 +64,12 @@ export default function Sidebar({
         <button
           onClick={() => setCollapsed((c) => !c)}
           className="ml-auto text-xs transition-colors"
-          style={{ background: "none", border: "none", color: T.muted, cursor: "pointer" }}
+          style={{
+            background: "none",
+            border: "none",
+            color: T.muted,
+            cursor: "pointer",
+          }}
         >
           {collapsed ? "›" : "‹"}
         </button>
@@ -79,12 +85,12 @@ export default function Sidebar({
               onClick={() => setActive(n.id)}
               className="w-full flex items-center gap-3 rounded-xl transition-all duration-150 relative"
               style={{
-                padding:        collapsed ? "10px 0" : "10px 12px",
+                padding: collapsed ? "10px 0" : "10px 12px",
                 justifyContent: collapsed ? "center" : "flex-start",
-                background:     isActive ? `${T.orange}18` : "transparent",
-                border:         `1px solid ${isActive ? T.orange + "35" : "transparent"}`,
-                color:          isActive ? T.orange : T.muted,
-                cursor:         "pointer",
+                background: isActive ? `${T.orange}18` : "transparent",
+                border: `1px solid ${isActive ? T.orange + "35" : "transparent"}`,
+                color: isActive ? T.orange : T.muted,
+                cursor: "pointer",
               }}
             >
               <span className="text-base">{n.icon}</span>
@@ -112,18 +118,22 @@ export default function Sidebar({
           onClick={onLogout}
           className="w-full flex items-center gap-3 rounded-xl transition-all duration-150"
           style={{
-            padding:        collapsed ? "10px 0" : "10px 12px",
+            padding: collapsed ? "10px 0" : "10px 12px",
             justifyContent: collapsed ? "center" : "flex-start",
-            background:     "none",
-            border:         "none",
-            color:          T.muted,
-            cursor:         "pointer",
+            background: "none",
+            border: "none",
+            color: T.muted,
+            cursor: "pointer",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = T.red)}
           onMouseLeave={(e) => (e.currentTarget.style.color = T.muted)}
         >
           <span>🚪</span>
-          {!collapsed && <span className="text-sm font-semibold">Logout</span>}
+          {!collapsed && (
+            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+              <span className="text-sm font-semibold">Logout</span>
+            </Link>
+          )}
         </button>
       </div>
     </aside>

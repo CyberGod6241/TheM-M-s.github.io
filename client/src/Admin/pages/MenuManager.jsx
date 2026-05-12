@@ -129,6 +129,13 @@ function MenuItemModal({ item, isNew, onSave, onClose }) {
               placeholder="https://…"
             />
 
+            <Input
+              label="Description"
+              value={form.desc || ""}
+              onChange={(e) => set("desc", e.target.value)}
+              placeholder="Brief description of the item"
+            />
+
             {/* Availability toggle */}
             <label className="flex items-center gap-3 cursor-pointer">
               <div
@@ -210,6 +217,7 @@ export default function MenuManager({ items, onSave, showToast }) {
           unitPrice: item.unitPrice,
           unitLabel: item.unitLabel,
           img: item.img,
+          desc: item.desc || "",
           available: item.available !== false,
         });
         const next = [...menu, { ...item, id: Date.now() }];
@@ -225,6 +233,7 @@ export default function MenuManager({ items, onSave, showToast }) {
           unitPrice: item.unitPrice,
           unitLabel: item.unitLabel,
           img: item.img,
+          desc: item.desc || "",
           available: item.available,
         });
         const next = menu.map((m) => (m.id === item.id ? item : m));

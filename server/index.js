@@ -204,8 +204,16 @@ app.get("/api/menu", async (req, res) => {
 
 app.post("/api/menu", verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { name, emoji, category, unitPrice, unitLabel, img, available } =
-      req.body;
+    const {
+      name,
+      emoji,
+      category,
+      unitPrice,
+      unitLabel,
+      img,
+      desc,
+      available,
+    } = req.body;
     if (!name || !category || typeof unitPrice !== "number") {
       return res
         .status(400)
@@ -219,6 +227,7 @@ app.post("/api/menu", verifyToken, verifyAdmin, async (req, res) => {
       unitPrice,
       unitLabel: unitLabel || "portion",
       img: img || "",
+      desc: desc || "",
       available: typeof available === "boolean" ? available : true,
       createdAt: serverTimestamp(),
       createdBy: req.user.uid,

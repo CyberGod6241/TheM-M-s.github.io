@@ -1,31 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 function MenuSection({ onAdd, T, MENU, CATEGORIES, fmt, MenuCard }) {
   const [activeCategory, setActiveCategory] = useState("All");
-  const [visibleIds, setVisibleIds] = useState(new Set());
-  const cardRefs = useRef({});
 
   const filtered =
     activeCategory === "All"
       ? MENU
       : MENU.filter((m) => m.category === activeCategory);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            setVisibleIds(
-              (prev) => new Set([...prev, parseInt(e.target.dataset.id)]),
-            );
-          }
-        });
-      },
-      { threshold: 0.1 },
-    );
-    Object.values(cardRefs.current).forEach((el) => el && obs.observe(el));
-    return () => obs.disconnect();
-  }, [filtered]);
 
   return (
     <section
@@ -93,13 +74,12 @@ function MenuSection({ onAdd, T, MENU, CATEGORIES, fmt, MenuCard }) {
           <div
             key={item.id}
             data-id={item.id}
-            ref={(el) => (cardRefs.current[item.id] = el)}
             style={{ transitionDelay: `${(idx % 4) * 80}ms` }}
           >
             <MenuCard
               item={item}
               onAdd={onAdd}
-              visible={visibleIds.has(item.id)}
+              visible={true}
               T={T}
               fmt={fmt}
             />

@@ -198,4 +198,5 @@ export const BLANK_MENU_ITEM = {
   unitLabel: "plate",
   available: true,
   img: "",
+  desc: "",
 };

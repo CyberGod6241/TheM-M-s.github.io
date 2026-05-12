@@ -8,7 +8,7 @@ import { T } from "../Admin/constants/theme";
 import Sidebar from "../Admin/components/layouts/Sidebar";
 import { Toast } from "../Admin/components/ui";
 
-import Login from "../Admin/pages/Login";
+// import Login from "../Admin/pages/Login";
 import Dashboard from "../Admin/pages/Dashboard";
 import Orders from "../Admin/pages/Orders";
 import MenuManager from "../Admin/pages/MenuManager";
@@ -22,7 +22,11 @@ import {
 
 function Admin({ menuItems, setMenuItems }) {
   // ── Auth ──────────────────────────────────────────────────────────────────
-  const [authed, setAuthed] = useState(false);
+  // Initialize from localStorage if admin is already logged in
+  // const [authed, setAuthed] = useState(() => {
+  //   const stored = localStorage.getItem("adminAuthed");
+  //   return stored === "true";
+  // });
 
   // ── Navigation ────────────────────────────────────────────────────────────
   const [view, setView] = useState("dashboard");
@@ -31,9 +35,14 @@ function Admin({ menuItems, setMenuItems }) {
   // ── Global data ───────────────────────────────────────────────────────────
   const [orders, setOrders] = useState([]);
 
+  // Persist admin login state to localStorage
+  // useEffect(() => {
+  //   localStorage.setItem("adminAuthed", String(authed));
+  // }, [authed]);
+
   // Fetch orders on mount
   useEffect(() => {
-    if (!authed) return;
+    // if (!authed) return;
 
     const loadOrders = async () => {
       try {
@@ -50,7 +59,7 @@ function Admin({ menuItems, setMenuItems }) {
     };
 
     loadOrders();
-  }, [authed]);
+  }, []);
 
   // ── Toast system ──────────────────────────────────────────────────────────
   const [toast, setToast] = useState({ msg: "", type: "info", visible: false });
@@ -98,7 +107,7 @@ function Admin({ menuItems, setMenuItems }) {
   const pendingCount = orders.filter((o) => o.status === "Pending").length;
 
   // ── Guard: show login if not authenticated ─────────────────────────────
-  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+  // if (!authed) return <Login onLogin={() => setAuthed(true)} />;
 
   // ── Main layout ───────────────────────────────────────────────────────────
   return (
@@ -115,7 +124,7 @@ function Admin({ menuItems, setMenuItems }) {
         active={view}
         setActive={setView}
         pendingCount={pendingCount}
-        onLogout={() => setAuthed(false)}
+        // onLogout={() => setAuthed(false)}
         collapsed={collapsed}
         setCollapsed={setCollapsed}
       />
