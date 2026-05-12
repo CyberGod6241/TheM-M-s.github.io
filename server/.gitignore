@@ -69,4 +69,5 @@ node_modules/
 .dataconnect
 
 # Firebase service account key file
-serviceAccountKey.json
+server/serviceAccountKey.json
+server/.env
