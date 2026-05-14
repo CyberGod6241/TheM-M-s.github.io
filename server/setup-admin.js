@@ -1,7 +1,6 @@
 const admin = require("firebase-admin");
 require("dotenv").config();
 
-const useMockBackend = process.env.USE_MOCK_BACKEND === "true";
 const useEmulator = Boolean(process.env.FIRESTORE_EMULATOR_HOST);
 const projectId = process.env.FIREBASE_PROJECT_ID || "food-restaurant-f298d";
 
@@ -9,12 +8,6 @@ let db;
 let auth;
 
 const initializeFirebase = () => {
-  if (useMockBackend) {
-    console.log("⚠️  Using mock backend mode - database setup skipped\n");
-    // For mock mode, we just return without initializing
-    return { isMock: true };
-  }
-
   try {
     const serviceAccount = require("./serviceAccountKey.json");
 
@@ -67,37 +60,29 @@ async function setupAdmin() {
   try {
     console.log(`\n📝 Setting up admin for UID: ${uid}\n`);
 
-    if (!isMock) {
-      // 1. Set custom claims on Firebase Auth
-      console.log("1️⃣  Setting custom claims in Firebase Auth...");
-      await auth.setCustomUserClaims(uid, { admin: true });
-      console.log("   ✅ Custom claims set successfully\n");
+    // 1. Set custom claims on Firebase Auth
+    console.log("1️⃣  Setting custom claims in Firebase Auth...");
+    await auth.setCustomUserClaims(uid, { admin: true });
+    console.log("   ✅ Custom claims set successfully\n");
 
-      // 2. Create/update user document in Firestore
-      console.log("2️⃣  Creating/updating user document in Firestore...");
-      await db.collection("users").doc(uid).set(
-        {
-          email,
-          displayName,
-          role: "admin",
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true },
-      );
-      console.log("   ✅ User document created successfully\n");
-    }
+    // 2. Create/update user document in Firestore
+    console.log("2️⃣  Creating/updating user document in Firestore...");
+    await db.collection("users").doc(uid).set(
+      {
+        email,
+        displayName,
+        role: "admin",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true },
+    );
+    console.log("   ✅ User document created successfully\n");
 
     console.log("✨ Admin account setup complete!\n");
     console.log(`📌 Steps to access admin panel:\n`);
     console.log(`1. Sign up or login with email: ${email}\n`);
     console.log(`2. Navigate to: http://localhost:5173/admin\n`);
-
-    if (isMock) {
-      console.log(
-        `💡 For testing with mock backend, use token: Bearer admin-token\n`,
-      );
-    }
   } catch (error) {
     console.error("❌ Error setting up admin:", error.message);
     process.exit(1);

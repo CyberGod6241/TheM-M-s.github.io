@@ -8,106 +8,10 @@ const projectId = process.env.FIREBASE_PROJECT_ID || "food-restaurant-f298d";
 
 let db;
 let auth;
-let useMock = false;
 
-const createMockDb = () => {
-  const collections = new Map();
-  let idCounter = 1;
-
-  const nextId = () => `${Date.now()}-${idCounter++}`;
-  const buildDoc = (id, data) => ({
-    id,
-    exists: data !== undefined,
-    data: () => data,
-  });
-  const makeSnapshot = (docs) => ({ docs });
-
-  const createCollection = (name) => {
-    if (!collections.has(name)) collections.set(name, new Map());
-    const store = collections.get(name);
-
-    const queryFromEntries = (entries) => ({
-      orderBy: (field, dir = "asc") => {
-        const sorted = [...entries].sort(([_, a], [__, b]) => {
-          const aVal = a[field];
-          const bVal = b[field];
-          if (aVal === bVal) return 0;
-          if (aVal === undefined || aVal === null) return 1;
-          if (bVal === undefined || bVal === null) return -1;
-          return dir === "desc" ? (aVal < bVal ? 1 : -1) : aVal > bVal ? 1 : -1;
-        });
-        return {
-          get: async () =>
-            makeSnapshot(sorted.map(([id, data]) => buildDoc(id, data))),
-        };
-      },
-      get: async () =>
-        makeSnapshot([...entries].map(([id, data]) => buildDoc(id, data))),
-    });
-
-    return {
-      doc: (id) => ({
-        get: async () => buildDoc(id, store.get(id)),
-        set: async (data, options = {}) => {
-          const existing = store.get(id) || {};
-          const next = options.merge ? { ...existing, ...data } : { ...data };
-          store.set(id, next);
-        },
-        update: async (data) => {
-          if (!store.has(id)) throw new Error("Document does not exist");
-          store.set(id, { ...store.get(id), ...data });
-        },
-        delete: async () => store.delete(id),
-      }),
-      add: async (data) => {
-        const id = nextId();
-        store.set(id, { ...data });
-        return { id };
-      },
-      get: async () =>
-        makeSnapshot(
-          [...store.entries()].map(([id, data]) => buildDoc(id, data)),
-        ),
-      where: (field, op, value) => {
-        const entries = [...store.entries()].filter(([_, data]) => {
-          if (op === "==") return data[field] === value;
-          return false;
-        });
-        return queryFromEntries(entries);
-      },
-      orderBy: (field, dir = "asc") => {
-        const entries = [...store.entries()];
-        return queryFromEntries(entries).orderBy(field, dir);
-      },
-    };
-  };
-
-  return { collection: createCollection };
-};
-
-const serverTimestamp = () =>
-  useMock
-    ? new Date().toISOString()
-    : admin.firestore.FieldValue.serverTimestamp();
-
-const getMockUserFromToken = (token) => {
-  if (token === "admin-token") return { uid: "admin", admin: true };
-  if (token === "customer-token") return { uid: "customer", admin: false };
-  if (token === "user-token") return { uid: "user", admin: false };
-  throw new Error("Invalid mock token");
-};
-
-const useMockBackend = process.env.USE_MOCK_BACKEND === "true";
+const serverTimestamp = () => admin.firestore.FieldValue.serverTimestamp();
 
 const startFirestore = () => {
-  if (useMockBackend) {
-    useMock = true;
-    db = createMockDb();
-    auth = { verifyIdToken: async (token) => getMockUserFromToken(token) };
-    console.log("Using mock backend mode for local testing.");
-    return;
-  }
-
   try {
     if (useEmulator) {
       admin.initializeApp({ projectId });
@@ -127,13 +31,8 @@ const startFirestore = () => {
       console.log("Starting Firestore with service account credentials.");
     }
   } catch (error) {
-    console.warn(
-      "Firestore initialization failed, using mock backend for local testing:",
-      error.message,
-    );
-    useMock = true;
-    db = createMockDb();
-    auth = { verifyIdToken: async (token) => getMockUserFromToken(token) };
+    console.error("Firestore initialization failed:", error.message);
+    process.exit(1);
   }
 };
 

@@ -1,13 +1,12 @@
 // ─── ORDERS PAGE ─────────────────────────────────────────────────────────────
 
 import { useState } from "react";
-import { T } from "../constants/theme";
 import { STATUSES } from "../constants/data";
 import { fmt, fmtDt, statusColor } from "../utils/helpers";
 import { Badge, Btn } from "../components/ui";
 
 // ── Order detail modal ────────────────────────────────────────────────────────
-function OrderModal({ order, onClose, onUpdateStatus }) {
+function OrderModal({ order, onClose, onUpdateStatus, T }) {
   const [current, setCurrent] = useState(order);
   const [updating, setUpdating] = useState(false);
 
@@ -198,7 +197,7 @@ function OrderModal({ order, onClose, onUpdateStatus }) {
 }
 
 // ── Orders page ───────────────────────────────────────────────────────────────
-export default function Orders({ orders, onUpdateStatus }) {
+export default function Orders({ orders, onUpdateStatus, T }) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
@@ -529,6 +528,7 @@ export default function Orders({ orders, onUpdateStatus }) {
           order={selected}
           onClose={() => setSelected(null)}
           onUpdateStatus={onUpdateStatus}
+          T={T}
         />
       )}
     </div>

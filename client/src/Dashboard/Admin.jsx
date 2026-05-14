@@ -3,8 +3,6 @@
 
 import { useState, useRef, useEffect } from "react";
 
-import { T } from "../Admin/constants/theme";
-
 import Sidebar from "../Admin/components/layouts/Sidebar";
 import { Toast } from "../Admin/components/ui";
 
@@ -20,7 +18,7 @@ import {
   sendNotificationToAll,
 } from "../utils/api";
 
-function Admin({ menuItems, setMenuItems }) {
+function Admin({ menuItems, setMenuItems, T }) {
   // ── Auth ──────────────────────────────────────────────────────────────────
   // Initialize from localStorage if admin is already logged in
   // const [authed, setAuthed] = useState(() => {
@@ -121,6 +119,7 @@ function Admin({ menuItems, setMenuItems }) {
     >
       {/* Sidebar */}
       <Sidebar
+        T={T}
         active={view}
         setActive={setView}
         pendingCount={pendingCount}
@@ -175,25 +174,26 @@ function Admin({ menuItems, setMenuItems }) {
         {/* Page content */}
         <div className="p-6">
           {view === "dashboard" && (
-            <Dashboard orders={orders} menuItems={menuItems} />
+            <Dashboard orders={orders} menuItems={menuItems} T={T} />
           )}
           {view === "orders" && (
-            <Orders orders={orders} onUpdateStatus={updateOrderStatus} />
+            <Orders orders={orders} onUpdateStatus={updateOrderStatus} T={T} />
           )}
           {view === "menu" && (
             <MenuManager
               items={menuItems}
               onSave={setMenuItems}
               showToast={showToast}
+              T={T}
             />
           )}
-          {view === "analytics" && <Analytics orders={orders} />}
-          {view === "settings" && <Settings showToast={showToast} />}
+          {view === "analytics" && <Analytics orders={orders} T={T} />}
+          {view === "settings" && <Settings showToast={showToast} T={T} />}
         </div>
       </main>
 
       {/* Global toast */}
-      <Toast msg={toast.msg} type={toast.type} visible={toast.visible} />
+      <Toast msg={toast.msg} type={toast.type} visible={toast.visible} T={T} />
     </div>
   );
 }

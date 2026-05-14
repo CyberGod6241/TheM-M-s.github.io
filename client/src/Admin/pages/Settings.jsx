@@ -1,12 +1,12 @@
 // ─── SETTINGS PAGE ───────────────────────────────────────────────────────────
 
 import { useState } from "react";
-import { T } from "../constants/theme";
 import { Btn } from "../components/ui";
+import { T } from "../../constants/theme";
 import { sendNotificationToAll } from "../../utils/api";
 
 // ── Reusable field wrapper ────────────────────────────────────────────────────
-function Field({ label, children }) {
+function Field({ label, children, T }) {
   return (
     <div>
       <label
@@ -39,7 +39,7 @@ function SettingsInput(props) {
 }
 
 // ── Toggle switch ─────────────────────────────────────────────────────────────
-function Toggle({ value, onChange, label }) {
+function Toggle({ value, onChange, label, T }) {
   return (
     <div
       className="flex items-center justify-between py-3"
@@ -61,7 +61,7 @@ function Toggle({ value, onChange, label }) {
 }
 
 // ── Section card wrapper ──────────────────────────────────────────────────────
-function SettingsCard({ title, children }) {
+function SettingsCard({ title, children, T }) {
   return (
     <div
       className="rounded-2xl p-6"
@@ -79,7 +79,7 @@ function SettingsCard({ title, children }) {
 }
 
 // ── Settings page ─────────────────────────────────────────────────────────────
-export default function Settings({ showToast }) {
+export default function Settings({ showToast, T }) {
   const [form, setForm] = useState({
     restaurantName: "Kumchop",
     tagline: "Every Taste feels Good.",
@@ -148,7 +148,7 @@ export default function Settings({ showToast }) {
       </div>
 
       {/* ── Restaurant info ── */}
-      <SettingsCard title="Restaurant Info">
+      <SettingsCard title="Restaurant Info" T={T}>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Field label="Restaurant Name">

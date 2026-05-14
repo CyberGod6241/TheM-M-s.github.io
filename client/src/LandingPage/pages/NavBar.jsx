@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
+import { T } from "../../constants/theme";
 import { Link } from "react-router-dom";
 
-function Navbar({ C }) {
+function Navbar({ T }) {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 30);
@@ -13,9 +14,9 @@ function Navbar({ C }) {
     <nav
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-3 flex items-center justify-between"
       style={{
-        background: scrolled ? `${C.brown900}f5` : "transparent",
+        background: scrolled ? `${T.brown900}f5` : "transparent",
         backdropFilter: scrolled ? "blur(10px)" : "none",
-        borderBottom: scrolled ? `1px solid ${C.orange}30` : "none",
+        borderBottom: scrolled ? `1px solid ${T.orange}30` : "none",
       }}
     >
       {/* Logo */}
@@ -23,7 +24,7 @@ function Navbar({ C }) {
         <span
           className="text-2xl font-black tracking-tight"
           style={{
-            color: C.orange,
+            color: T?.orange,
             fontFamily: "'Georgia', serif",
             letterSpacing: "-0.02em",
           }}
@@ -39,7 +40,7 @@ function Navbar({ C }) {
       <Link to="/customer">
         <button
           className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-105"
-          style={{ background: C.orange, color: "white" }}
+          style={{ background: T?.orange, color: "white" }}
         >
           SignUp
         </button>

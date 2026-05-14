@@ -1,11 +1,12 @@
+import { T } from "../../constants/theme";
 import Bokeh from "./Bokeh";
 
-function Hero({ C }) {
+function Hero({ T }) {
   return (
     <section
       className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-12 overflow-hidden"
       style={{
-        background: `linear-gradient(160deg, ${C.brown900} 0%, ${C.brown800} 50%, ${C.brown700} 100%)`,
+        background: `linear-gradient(160deg, ${T?.brown900} 0%, ${T?.brown800} 50%, ${T?.brown700} 100%)`,
       }}
     >
       <Bokeh />
@@ -14,9 +15,9 @@ function Hero({ C }) {
       <div
         className="relative z-10 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-6 animate-pulse"
         style={{
-          background: `${C.orange}22`,
-          border: `1px solid ${C.orange}55`,
-          color: C.orange,
+          background: `${T?.orange}22`,
+          border: `1px solid ${T?.orange}55`,
+          color: T?.orange,
         }}
       >
         🎉 Grand Opening Promo — Ending Soon
@@ -29,8 +30,8 @@ function Hero({ C }) {
           className="font-black leading-none mb-2"
           style={{
             fontSize: "clamp(4rem, 18vw, 10rem)",
-            color: C.orange,
-            textShadow: `0 0 80px ${C.orange}60`,
+            color: T?.orange,
+            textShadow: `0 0 80px ${T?.orange}60`,
             fontFamily: "'Georgia', serif",
           }}
         >
@@ -58,7 +59,7 @@ function Hero({ C }) {
           <div
             key={i}
             className="w-24 h-24 sm:w-32 sm:h-32 rounded-full flex flex-col items-center justify-center text-4xl sm:text-5xl shadow-xl border-4 transition-transform duration-300 hover:scale-110 hover:-translate-y-2"
-            style={{ background: food.bg, borderColor: C.orange + "55" }}
+            style={{ background: food.bg, borderColor: T?.orange + "55" }}
             title={food.label}
           >
             {food.emoji}
@@ -75,8 +76,8 @@ function Hero({ C }) {
           href="tel:08026875555"
           className="px-8 py-4 rounded-full text-base font-bold text-white transition-all duration-200 hover:scale-105 hover:shadow-2xl"
           style={{
-            background: `linear-gradient(135deg, ${C.orange}, ${C.orangeD})`,
-            boxShadow: `0 8px 40px ${C.orange}50`,
+            background: `linear-gradient(135deg, ${T?.orange}, ${T?.orangeD})`,
+            boxShadow: `0 8px 40px ${T?.orange}50`,
           }}
         >
           Order Now
@@ -84,7 +85,7 @@ function Hero({ C }) {
         <a
           href="#menu"
           className="px-8 py-4 rounded-full text-base font-semibold transition-all duration-200 hover:scale-105"
-          style={{ border: `2px solid ${C.orange}`, color: C.orange }}
+          style={{ border: `2px solid ${T?.orange}`, color: T?.orange }}
         >
           View Full Menu
         </a>

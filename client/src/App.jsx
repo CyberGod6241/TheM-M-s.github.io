@@ -6,6 +6,8 @@ import Admin from "./Dashboard/Admin";
 import Login from "./Customer/pages/Login";
 import SignUp from "./Customer/pages/SignUp";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Loader from "./constants/Loader";
+import { T } from "./constants/theme";
 import { useState, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
@@ -254,12 +256,13 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage T={T} />} />
       <Route
         path="/customer"
         element={
           authed && !authLoading ? (
             <Customer
+              T={T}
               menuItems={menuItems}
               cartItems={cartItems}
               setCartItems={setCartItems}
@@ -287,7 +290,7 @@ function App() {
             </div>
           ) : (
             <div style={{ textAlign: "center", paddingTop: "50px" }}>
-              <h2>Loading...</h2>
+              <Loader />
             </div>
           )
         }
@@ -296,6 +299,7 @@ function App() {
         path="/order"
         element={
           <OrderSection
+            T={T}
             cartItems={cartItems}
             onPlaceOrder={handlePlaceOrder}
             successOrder={successOrder}
@@ -311,15 +315,16 @@ function App() {
             authed={authed}
             isLoading={authLoading}
           >
-            <Admin menuItems={menuItems} setMenuItems={setMenuItems} />
+            <Admin menuItems={menuItems} setMenuItems={setMenuItems} T={T} />
           </ProtectedRoute>
         }
       />
-      <Route path="/view-order" element={<ViewOrder />} />
+      <Route path="/view-order" element={<ViewOrder T={T} />} />
       <Route
         path="/Login"
         element={
           <Login
+            T={T}
             handleKeyDown={handleKeyDownLogin}
             setPassword={setPassword}
             setEmail={setEmail}
@@ -337,6 +342,7 @@ function App() {
         path="/SignUp"
         element={
           <SignUp
+            T={T}
             handleKeyDown={handleKeyDown}
             setPassword={setPassword}
             setEmail={setEmail}

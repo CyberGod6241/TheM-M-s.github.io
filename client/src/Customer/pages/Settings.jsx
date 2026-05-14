@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { T } from "../../Admin/constants/theme";
 import { Btn, Input } from "../../Admin/components/ui";
 import { updateUserProfile, changePassword } from "../../utils/api";
 
@@ -18,7 +17,12 @@ const AVATARS = [
   "👵",
 ];
 
-export default function CustomerSettings({ user, onUpdateProfile, showToast }) {
+export default function CustomerSettings({
+  user,
+  onUpdateProfile,
+  showToast,
+  T,
+}) {
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);

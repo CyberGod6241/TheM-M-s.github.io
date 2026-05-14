@@ -7,7 +7,6 @@ import OrderCTA from "../LandingPage/pages/OrderCTA";
 import Footer from "../LandingPage/pages/Footer";
 
 import { menuData as FALLBACK_MENU } from "../LandingPage/constants/data";
-import { C } from "../LandingPage/constants/theme";
 import { useEffect, useState } from "react";
 import { getMenuItems } from "../utils/api";
 
@@ -15,7 +14,7 @@ import { getMenuItems } from "../utils/api";
 // COMPONENTS
 // ─────────────────────────────────────────────
 
-function LandingPage() {
+function LandingPage({ T }) {
   const [menuData, setMenuData] = useState(FALLBACK_MENU);
   const [loading, setLoading] = useState(true);
 
@@ -59,17 +58,17 @@ function LandingPage() {
     <div
       className="min-h-screen"
       style={{
-        background: C?.brown900 || "#3f1e0e",
+        background: T?.brown900 || "#3f1e0e",
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <Navbar C={C} />
-      <Bokeh C={C} />
-      <Hero C={C} />
-      <Banner C={C} />
-      {!loading && <MenuSection C={C} menuData={menuData} />}
-      <OrderCTA C={C} />
-      <Footer C={C} />
+      <Navbar T={T} />
+      <Bokeh T={T} />
+      <Hero T={T} />
+      <Banner T={T} />
+      {!loading && <MenuSection T={T} menuData={menuData} />}
+      <OrderCTA T={T} />
+      <Footer T={T} />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 // ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
 
 import { Input, Btn } from "../../Admin/components/ui";
-import { T } from "../../Admin/constants/theme";
 import { Link } from "react-router-dom";
 
 export default function Login({
@@ -13,6 +12,7 @@ export default function Login({
   password,
   handleKeyDown,
   handleLogin,
+  T,
 }) {
   return (
     <div

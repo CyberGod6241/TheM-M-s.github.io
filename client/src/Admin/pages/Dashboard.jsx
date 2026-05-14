@@ -1,25 +1,24 @@
 // ─── DASHBOARD PAGE ───────────────────────────────────────────────────────────
 
-import { T } from "../constants/theme";
 import { STATUSES } from "../constants/data";
 import { fmt, fmtDt, statusColor } from "../utils/helpers";
 import { StatCard, MiniBar, Badge } from "../components/ui";
 
 // Fixed weekly revenue data — replace with a real API call in production.
 const WEEK_DATA = [
-  { l: "Mon", v: 42000  },
-  { l: "Tue", v: 67000  },
-  { l: "Wed", v: 55000  },
-  { l: "Thu", v: 89000  },
+  { l: "Mon", v: 42000 },
+  { l: "Tue", v: 67000 },
+  { l: "Wed", v: 55000 },
+  { l: "Thu", v: 89000 },
   { l: "Fri", v: 120000 },
   { l: "Sat", v: 145000 },
-  { l: "Sun", v: 98000  },
+  { l: "Sun", v: 98000 },
 ];
 
-export default function Dashboard({ orders, menuItems }) {
+export default function Dashboard({ orders, menuItems, T }) {
   const delivered = orders.filter((o) => o.status === "Delivered");
-  const pending   = orders.filter((o) => o.status === "Pending");
-  const revenue   = delivered.reduce((s, o) => s + o.total, 0);
+  const pending = orders.filter((o) => o.status === "Pending");
+  const revenue = delivered.reduce((s, o) => s + o.total, 0);
   const customers = new Set(orders.map((o) => o.phone)).size;
 
   const topItems = [...menuItems]
@@ -48,10 +47,37 @@ export default function Dashboard({ orders, menuItems }) {
 
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon="₦"  label="Total Revenue"     value={fmt(revenue)}      sub="From delivered orders"        trend={12}                   />
-        <StatCard icon="🧾" label="Total Orders"      value={orders.length}     sub={`${pending.length} pending`}  trend={8}  color={T.blue}    />
-        <StatCard icon="✅" label="Delivered"         value={delivered.length}  sub="Completed successfully"       trend={5}  color={T.green}   />
-        <StatCard icon="👥" label="Unique Customers"  value={customers}         sub="All time"                     trend={-2} color="#a855f7"   />
+        <StatCard
+          icon="₦"
+          label="Total Revenue"
+          value={fmt(revenue)}
+          sub="From delivered orders"
+          trend={12}
+        />
+        <StatCard
+          icon="🧾"
+          label="Total Orders"
+          value={orders.length}
+          sub={`${pending.length} pending`}
+          trend={8}
+          color={T.blue}
+        />
+        <StatCard
+          icon="✅"
+          label="Delivered"
+          value={delivered.length}
+          sub="Completed successfully"
+          trend={5}
+          color={T.green}
+        />
+        <StatCard
+          icon="👥"
+          label="Unique Customers"
+          value={customers}
+          sub="All time"
+          trend={-2}
+          color="#a855f7"
+        />
       </div>
 
       {/* Charts row */}
@@ -87,7 +113,7 @@ export default function Dashboard({ orders, menuItems }) {
           <div className="space-y-3">
             {statusBreakdown.map(({ s, count }) => {
               const pct = Math.round((count / orders.length) * 100);
-              const c   = statusColor(s);
+              const c = statusColor(s);
               return (
                 <div key={s}>
                   <div className="flex justify-between text-xs mb-1">
@@ -140,7 +166,10 @@ export default function Dashboard({ orders, menuItems }) {
                   </p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-bold mb-1" style={{ color: T.orange }}>
+                  <p
+                    className="text-sm font-bold mb-1"
+                    style={{ color: T.orange }}
+                  >
                     {fmt(o.total)}
                   </p>
                   <Badge label={o.status} />
@@ -167,7 +196,9 @@ export default function Dashboard({ orders, menuItems }) {
                 </span>
                 <span className="text-lg">{item.emoji}</span>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-white">{item.name}</p>
+                  <p className="text-sm font-semibold text-white">
+                    {item.name}
+                  </p>
                   <p className="text-xs" style={{ color: T.muted }}>
                     {fmt(item.unitPrice)} / {item.unitLabel}
                   </p>

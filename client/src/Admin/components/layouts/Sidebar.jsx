@@ -1,6 +1,4 @@
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
-
-import { T } from "../../constants/theme";
 import { Link } from "react-router-dom";
 
 const NAV = [
@@ -18,6 +16,7 @@ export default function Sidebar({
   onLogout,
   collapsed,
   setCollapsed,
+  T,
 }) {
   return (
     <aside

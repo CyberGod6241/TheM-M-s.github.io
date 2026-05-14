@@ -1,6 +1,4 @@
 // ─── ANALYTICS PAGE ──────────────────────────────────────────────────────────
-
-import { T } from "../constants/theme";
 import { STATUSES } from "../constants/data";
 import { fmt, statusColor } from "../utils/helpers";
 import { StatCard, MiniBar } from "../components/ui";
@@ -17,24 +15,26 @@ function buildDailyRevenue() {
   });
 }
 
-export default function Analytics({ orders }) {
+export default function Analytics({ orders, T }) {
   const delivered = orders.filter((o) => o.status === "Delivered");
   const cancelled = orders.filter((o) => o.status === "Cancelled");
-  const revenue   = delivered.reduce((s, o) => s + o.total, 0);
-  const avgOrder  = delivered.length ? Math.round(revenue / delivered.length) : 0;
+  const revenue = delivered.reduce((s, o) => s + o.total, 0);
+  const avgOrder = delivered.length
+    ? Math.round(revenue / delivered.length)
+    : 0;
 
-  const fulfilmentRate  = Math.round((delivered.length / orders.length) * 100);
-  const cancellationRate= Math.round((cancelled.length / orders.length) * 100);
+  const fulfilmentRate = Math.round((delivered.length / orders.length) * 100);
+  const cancellationRate = Math.round((cancelled.length / orders.length) * 100);
 
   // Category popularity
   const byCat = {};
   orders.forEach((o) =>
     o.items.forEach((it) => {
       byCat[it.category] = (byCat[it.category] || 0) + it.qty;
-    })
+    }),
   );
   const catData = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
-  const catMax  = catData[0]?.[1] || 1;
+  const catMax = catData[0]?.[1] || 1;
 
   // Status breakdown
   const byStatus = STATUSES.map((s) => ({
@@ -48,7 +48,7 @@ export default function Analytics({ orders }) {
     .map((ph) => {
       const cOrders = orders.filter((o) => o.phone === ph);
       return {
-        name:  cOrders[0].customer,
+        name: cOrders[0].customer,
         count: cOrders.length,
         total: cOrders.reduce((s, o) => s + o.total, 0),
       };
@@ -74,10 +74,34 @@ export default function Analytics({ orders }) {
 
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon="💰" label="Total Revenue"     value={fmt(revenue)}         color={T.orange}  trend={14} />
-        <StatCard icon="🧾" label="Avg Order Value"   value={fmt(avgOrder)}        color={T.blue}    trend={5}  />
-        <StatCard icon="✅" label="Fulfilment Rate"   value={`${fulfilmentRate}%`} color={T.green}   trend={3}  />
-        <StatCard icon="❌" label="Cancellation Rate" value={`${cancellationRate}%`} color={T.red}   trend={-2} />
+        <StatCard
+          icon="💰"
+          label="Total Revenue"
+          value={fmt(revenue)}
+          color={T.orange}
+          trend={14}
+        />
+        <StatCard
+          icon="🧾"
+          label="Avg Order Value"
+          value={fmt(avgOrder)}
+          color={T.blue}
+          trend={5}
+        />
+        <StatCard
+          icon="✅"
+          label="Fulfilment Rate"
+          value={`${fulfilmentRate}%`}
+          color={T.green}
+          trend={3}
+        />
+        <StatCard
+          icon="❌"
+          label="Cancellation Rate"
+          value={`${cancellationRate}%`}
+          color={T.red}
+          trend={-2}
+        />
       </div>
 
       {/* Charts row */}
@@ -118,7 +142,7 @@ export default function Analytics({ orders }) {
                   <div
                     className="h-full rounded-full"
                     style={{
-                      width:      `${(n / catMax) * 100}%`,
+                      width: `${(n / catMax) * 100}%`,
                       background: `linear-gradient(90deg,${T.orange},${T.orangeD})`,
                     }}
                   />
@@ -141,7 +165,7 @@ export default function Analytics({ orders }) {
           </h3>
           <div className="space-y-3">
             {byStatus.map(({ s, n }) => {
-              const c   = statusColor(s);
+              const c = statusColor(s);
               const pct = Math.round((n / orders.length) * 100);
               return (
                 <div key={s} className="flex items-center gap-3">
@@ -185,7 +209,7 @@ export default function Analytics({ orders }) {
                   className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                   style={{
                     background: i === 0 ? T.orange : `${T.orange}20`,
-                    color:      i === 0 ? "#fff"   : T.orange,
+                    color: i === 0 ? "#fff" : T.orange,
                   }}
                 >
                   {i + 1}
@@ -196,10 +220,7 @@ export default function Analytics({ orders }) {
                     {c.count} orders
                   </p>
                 </div>
-                <p
-                  className="font-bold text-sm"
-                  style={{ color: T.orange }}
-                >
+                <p className="font-bold text-sm" style={{ color: T.orange }}>
                   {fmt(c.total)}
                 </p>
               </div>

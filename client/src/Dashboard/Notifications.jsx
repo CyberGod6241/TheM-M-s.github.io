@@ -1,10 +1,8 @@
-import { useState } from "react";
-import { T } from "../Admin/constants/theme";
-
 function Notifications({
   notifications,
   setNotifications,
   setNotificationCount,
+  T,
 }) {
   const markAsRead = (id) => {
     setNotifications((prev) =>

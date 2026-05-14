@@ -1,7 +1,5 @@
 // ─── CUSTOMER SIDEBAR ─────────────────────────────────────────────────────────────────
 
-import { T } from "../../../Admin/constants/theme";
-
 const NAV = [
   { id: "dashboard", icon: "🏠", label: "Dashboard" },
   { id: "orders", icon: "🧾", label: "My Orders" },
@@ -16,6 +14,7 @@ export default function CustomerSidebar({
   collapsed,
   setCollapsed,
   notificationCount,
+  T,
 }) {
   return (
     <aside

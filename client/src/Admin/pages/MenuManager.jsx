@@ -1,7 +1,6 @@
 // ─── MENU MANAGER PAGE ───────────────────────────────────────────────────────
 
 import { useState } from "react";
-import { T } from "../constants/theme";
 import { MENU_CATEGORIES, BLANK_MENU_ITEM } from "../constants/data";
 import { fmt } from "../utils/helpers";
 import { Btn, Input, Select } from "../components/ui";
@@ -12,7 +11,7 @@ import {
 } from "../../utils/api";
 
 // ── Edit / Add modal ──────────────────────────────────────────────────────────
-function MenuItemModal({ item, isNew, onSave, onClose }) {
+function MenuItemModal({ item, isNew, onSave, onClose, T }) {
   const [form, setForm] = useState({ ...item });
   const set = (key, val) => setForm((p) => ({ ...p, [key]: val }));
 
@@ -171,7 +170,7 @@ function MenuItemModal({ item, isNew, onSave, onClose }) {
 }
 
 // ── Menu Manager page ─────────────────────────────────────────────────────────
-export default function MenuManager({ items, onSave, showToast }) {
+export default function MenuManager({ items, onSave, showToast, T }) {
   const [menu, setMenu] = useState(items);
   const [editing, setEditing] = useState(null);
   const [isNew, setIsNew] = useState(false);
@@ -433,6 +432,7 @@ export default function MenuManager({ items, onSave, showToast }) {
           isNew={isNew}
           onSave={saveItem}
           onClose={() => setEditing(null)}
+          T={T}
         />
       )}
     </div>

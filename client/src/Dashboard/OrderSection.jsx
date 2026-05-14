@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Bokeh from "../Customer/pages/Bokeh";
 import SuccessModal from "../Customer/pages/SuccesModal";
-import { T } from "../Customer/constant/theme";
 import { fmt } from "../Customer/utils/helpers";
 
 function OrderSection({
@@ -9,6 +8,7 @@ function OrderSection({
   onPlaceOrder,
   successOrder,
   setSuccessOrder,
+  T,
 }) {
   const [form, setForm] = useState({
     name: "",
@@ -45,7 +45,7 @@ function OrderSection({
         background: `linear-gradient(180deg,#1a0800 0%,${T.brown900} 100%)`,
       }}
     >
-      <Bokeh count={2} />
+      <Bokeh count={2} T={T} />
       <div className="relative z-10 max-w-2xl mx-auto">
         <div className="text-center mb-12">
           <span

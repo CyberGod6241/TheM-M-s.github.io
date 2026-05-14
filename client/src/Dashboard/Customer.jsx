@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import CustomerSidebar from "../Admin/components/layouts/CustomerSidebar";
+import CustomerSidebar from "../Customer/components/layouts/CustomerSidebar";
 import { Toast } from "../Admin/components/ui";
 import Hero from "../Customer/pages/Hero";
 import MenuSection from "../Customer/pages/MenuSection";
@@ -52,6 +52,7 @@ function Customer({
   authed,
   user,
   handleLogout,
+  T,
 }) {
   const [view, setView] = useState("dashboard");
   const [collapsed, setCollapsed] = useState(false);
@@ -130,6 +131,7 @@ function Customer({
         collapsed={collapsed}
         setCollapsed={setCollapsed}
         notificationCount={notificationCount}
+        T={T}
       />
 
       {/* Main content area */}
@@ -190,12 +192,13 @@ function Customer({
               />
             </div>
           )}
-          {view === "orders" && <ViewOrder orders={userOrders} />}
+          {view === "orders" && <ViewOrder orders={userOrders} T={T} />}
           {view === "notifications" && (
             <Notifications
               notifications={notifications}
               setNotifications={setNotifications}
               setNotificationCount={setNotificationCount}
+              T={T}
             />
           )}
           {view === "settings" && (
@@ -203,6 +206,7 @@ function Customer({
               user={user}
               onUpdateProfile={handleUpdateProfile}
               showToast={showToast}
+              T={T}
             />
           )}
         </div>
@@ -222,7 +226,7 @@ function Customer({
       )}
 
       {/* Success Modal */}
-      <SuccessModal />
+      <SuccessModal T={T} />
 
       {/* Floating cart FAB (mobile) */}
       {cartItems.length > 0 && !cartOpen && (

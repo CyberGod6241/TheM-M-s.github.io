@@ -1,11 +1,11 @@
 import Bokeh from "./Bokeh";
 
-function OrderCTA({ C }) {
+function OrderCTA({ T }) {
   return (
     <section
       className="py-20 px-6 text-center relative overflow-hidden"
       style={{
-        background: `linear-gradient(135deg, ${C.brown700} 0%, ${C.brown900} 100%)`,
+        background: `linear-gradient(135deg, ${T?.brown700} 0%, ${T?.brown900} 100%)`,
       }}
     >
       <Bokeh />
@@ -24,8 +24,8 @@ function OrderCTA({ C }) {
             href="tel:08026875555"
             className="px-8 py-4 rounded-full font-bold text-white text-base transition-all hover:scale-105"
             style={{
-              background: `linear-gradient(135deg, ${C.orange}, ${C.orangeD})`,
-              boxShadow: `0 8px 40px ${C.orange}40`,
+              background: `linear-gradient(135deg, ${T?.orange}, ${T?.orangeD})`,
+              boxShadow: `0 8px 40px ${T?.orange}40`,
             }}
           >
             📞 08026875555
@@ -33,7 +33,7 @@ function OrderCTA({ C }) {
           <a
             href="tel:08034276312"
             className="px-8 py-4 rounded-full font-semibold text-base transition-all hover:scale-105"
-            style={{ border: `2px solid ${C.orange}`, color: C.orange }}
+            style={{ border: `2px solid ${T?.orange}`, color: T?.orange }}
           >
             📞 0803 427 6312
           </a>

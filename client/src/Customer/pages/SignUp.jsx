@@ -1,7 +1,6 @@
 // ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
 
 import { Input, Btn } from "../../Admin/components/ui";
-import { T } from "../../Admin/constants/theme";
 import { Link } from "react-router-dom";
 
 export default function SignUp({
@@ -17,6 +16,7 @@ export default function SignUp({
   setFirstName,
   lastName,
   setLastName,
+  T,
 }) {
   return (
     <div

@@ -1,6 +1,4 @@
-import { T } from "../Admin/constants/theme";
-
-function ViewOrder({ orders }) {
+function ViewOrder({ orders, T }) {
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
