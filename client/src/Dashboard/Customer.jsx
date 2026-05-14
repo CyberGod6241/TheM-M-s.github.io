@@ -10,6 +10,7 @@ import CartPanel from "../Customer/pages/CartPanel";
 import SuccessModal from "../Customer/pages/SuccesModal";
 import MenuCard from "../Customer/pages/MenuCard";
 import SignUp from "../Customer/pages/SignUp";
+import Settings from "../Customer/pages/Settings";
 
 import { T } from "../Customer/constant/theme";
 import { fmt } from "../Customer/utils/helpers";
@@ -47,6 +48,7 @@ function Customer({
   cartOpen,
   handleCheckout,
   toast,
+  setToast,
   authed,
   user,
   handleLogout,
@@ -56,6 +58,20 @@ function Customer({
   const [userOrders, setUserOrders] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [userProfile, setUserProfile] = useState({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    avatar: user?.avatar || "👨",
+  });
+
+  const showToast = (msg, type = "info") => {
+    setToast({ msg, visible: true, type });
+    setTimeout(() => setToast({ msg: "", visible: false }), 2600);
+  };
+
+  const handleUpdateProfile = (updatedProfile) => {
+    setUserProfile(updatedProfile);
+  };
 
   // Load user orders
   useEffect(() => {
@@ -129,6 +145,11 @@ function Customer({
         >
           <div className="flex items-center gap-3">
             <h1 className="font-semibold text-white capitalize">{view}</h1>
+            {view === "dashboard" && userProfile.firstName && (
+              <span style={{ color: T.muted }} className="text-sm">
+                Welcome, {userProfile.firstName}! 👋
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <div className="text-xs" style={{ color: T.muted }}>
@@ -146,7 +167,10 @@ function Customer({
                 background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
               }}
             >
-              {user?.displayName?.[0] || user?.email?.[0] || "U"}
+              {userProfile.avatar ||
+                user?.displayName?.[0] ||
+                user?.email?.[0] ||
+                "U"}
             </div>
           </div>
         </div>
@@ -172,6 +196,13 @@ function Customer({
               notifications={notifications}
               setNotifications={setNotifications}
               setNotificationCount={setNotificationCount}
+            />
+          )}
+          {view === "settings" && (
+            <Settings
+              user={user}
+              onUpdateProfile={handleUpdateProfile}
+              showToast={showToast}
             />
           )}
         </div>

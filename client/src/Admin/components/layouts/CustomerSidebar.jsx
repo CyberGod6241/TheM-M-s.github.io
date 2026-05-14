@@ -6,6 +6,7 @@ const NAV = [
   { id: "dashboard", icon: "🏠", label: "Dashboard" },
   { id: "orders", icon: "🧾", label: "My Orders" },
   { id: "notifications", icon: "🔔", label: "Notifications" },
+  { id: "settings", icon: "⚙️", label: "Settings" },
 ];
 
 export default function CustomerSidebar({

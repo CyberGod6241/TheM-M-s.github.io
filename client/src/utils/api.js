@@ -1,4 +1,5 @@
 import { auth } from "../authentication/firebase";
+import { signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // HELPERS
@@ -346,6 +347,67 @@ export const sendNotificationToAll = async (title, message) => {
     return await response.json();
   } catch (error) {
     console.error("Error sending notification:", error);
+    throw error;
+  }
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
+// USER PROFILE
+// ──────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Update user profile (first name, last name, avatar)
+ */
+export const updateUserProfile = async (profileData) => {
+  try {
+    const token = await getAuthToken();
+    const response = await fetch(`${API_BASE}/users/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(profileData),
+    });
+    if (!response.ok) throw new Error("Failed to update profile");
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw error;
+  }
+};
+
+/**
+ * Change user password
+ */
+export const changePassword = async (oldPassword, newPassword) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error("User not authenticated");
+
+    // Re-authenticate user with old password
+    await signInWithEmailAndPassword(auth, user.email, oldPassword);
+
+    // Update password using Firebase
+    await updatePassword(user, newPassword);
+
+    // Notify backend about password change
+    const token = await getAuthToken();
+    await fetch(`${API_BASE}/users/change-password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ oldPassword, newPassword }),
+    });
+
+    return { message: "Password changed successfully" };
+  } catch (error) {
+    console.error("Error changing password:", error);
+    if (error.code === "auth/wrong-password") {
+      throw new Error("Old password is incorrect");
+    }
     throw error;
   }
 };

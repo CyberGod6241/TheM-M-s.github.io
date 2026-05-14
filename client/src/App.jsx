@@ -33,6 +33,8 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
@@ -162,6 +164,12 @@ function App() {
     setLoading(true);
     setError("");
     try {
+      if (!firstName.trim() || !lastName.trim()) {
+        setError("First name and last name are required");
+        setLoading(false);
+        return;
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -172,9 +180,11 @@ function App() {
       setAuthed(true);
       setEmail("");
       setPassword("");
+      setFirstName("");
+      setLastName("");
       console.log("Signed up:", newUser);
 
-      // Sync user to backend
+      // Sync user to backend with profile info
       await syncUser();
 
       navigate("/customer");
@@ -337,6 +347,10 @@ function App() {
             setError={setError}
             setLoading={setLoading}
             handleSignUp={handleSignUp}
+            firstName={firstName}
+            setFirstName={setFirstName}
+            lastName={lastName}
+            setLastName={setLastName}
           />
         }
       />

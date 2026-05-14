@@ -538,6 +538,68 @@ app.post(
   },
 );
 
+// ── USER PROFILE ENDPOINTS ─────────────────────────────────────────────────
+app.put("/api/users/profile", verifyToken, async (req, res) => {
+  try {
+    const { firstName, lastName, avatar } = req.body;
+
+    if (!firstName || !lastName) {
+      return res
+        .status(400)
+        .json({ error: "First name and last name are required" });
+    }
+
+    const updateData = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      avatar: avatar || "👨",
+      updatedAt: serverTimestamp(),
+    };
+
+    await db.collection("users").doc(req.user.uid).update(updateData);
+
+    res.json({
+      message: "Profile updated successfully",
+      data: updateData,
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ── CHANGE PASSWORD ENDPOINT ───────────────────────────────────────────────
+app.put("/api/users/change-password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Old password and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res
+        .status(400)
+        .json({ error: "New password must be at least 6 characters" });
+    }
+
+    // In a real Firebase setup, you would use Firebase Admin SDK to update password
+    // For now, we'll use the Firebase Client SDK approach via error handling
+    // The actual password change should happen on the client side with Firebase
+    // then verified here, or implement custom auth logic
+
+    // Placeholder response - actual implementation depends on your auth setup
+    res.json({
+      message: "Password change request received. Update on client side.",
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });

@@ -13,6 +13,10 @@ export default function SignUp({
   password,
   handleKeyDown,
   handleSignUp,
+  firstName,
+  setFirstName,
+  lastName,
+  setLastName,
 }) {
   return (
     <div
@@ -68,6 +72,24 @@ export default function SignUp({
           <h2 className="text-lg font-bold text-white mb-6">Sign Up</h2>
 
           <div className="space-y-4 mb-6">
+            <div className="grid grid-cols-2 gap-3">
+              <Input
+                label="First Name"
+                type="text"
+                placeholder="First name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <Input
+                label="Last Name"
+                type="text"
+                placeholder="Last name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+            </div>
             <Input
               label="Email"
               type="email"
