@@ -6,7 +6,7 @@ import { T } from "../../constants/theme";
 import { sendNotificationToAll } from "../../utils/api";
 
 // ── Reusable field wrapper ────────────────────────────────────────────────────
-function Field({ label, children, T }) {
+function Field({ label, children }) {
   return (
     <div>
       <label
@@ -39,7 +39,7 @@ function SettingsInput(props) {
 }
 
 // ── Toggle switch ─────────────────────────────────────────────────────────────
-function Toggle({ value, onChange, label, T }) {
+function Toggle({ value, onChange, label}) {
   return (
     <div
       className="flex items-center justify-between py-3"
@@ -61,7 +61,7 @@ function Toggle({ value, onChange, label, T }) {
 }
 
 // ── Section card wrapper ──────────────────────────────────────────────────────
-function SettingsCard({ title, children, T }) {
+function SettingsCard({ title, children }) {
   return (
     <div
       className="rounded-2xl p-6"
@@ -148,7 +148,7 @@ export default function Settings({ showToast, T }) {
       </div>
 
       {/* ── Restaurant info ── */}
-      <SettingsCard title="Restaurant Info" T={T}>
+      <SettingsCard title="Restaurant Info">
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Field label="Restaurant Name">

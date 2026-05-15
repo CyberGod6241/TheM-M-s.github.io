@@ -37,7 +37,7 @@ function Navbar({ T }) {
       </div>
 
       {/* CTA */}
-      <Link to="/customer">
+      <Link to="/login">
         <button
           className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-105"
           style={{ background: T?.orange, color: "white" }}

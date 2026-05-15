@@ -207,6 +207,7 @@ function Customer({
               onUpdateProfile={handleUpdateProfile}
               showToast={showToast}
               T={T}
+              onLogout={handleLogout}
             />
           )}
         </div>

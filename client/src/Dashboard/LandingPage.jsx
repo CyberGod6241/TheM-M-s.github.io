@@ -14,7 +14,7 @@ import { getMenuItems } from "../utils/api";
 // COMPONENTS
 // ─────────────────────────────────────────────
 
-function LandingPage({ T }) {
+function LandingPage({ T, authed, authLoading }) {
   const [menuData, setMenuData] = useState(FALLBACK_MENU);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +62,7 @@ function LandingPage({ T }) {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <Navbar T={T} />
+      <Navbar T={T} authLoading={authLoading} authed={authed} />
       <Bokeh T={T} />
       <Hero T={T} />
       <Banner T={T} />

@@ -22,6 +22,7 @@ export default function CustomerSettings({
   onUpdateProfile,
   showToast,
   T,
+  onLogout,
 }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -116,245 +117,276 @@ export default function CustomerSettings({
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-8 pb-12 max-w-6xl">
       {/* Header */}
       <div>
-        <h2
-          className="text-2xl font-black text-white"
+        <h1
+          className="text-3xl font-black text-white mb-2"
           style={{ fontFamily: "'Georgia',serif" }}
         >
           Settings
-        </h2>
+        </h1>
         <p className="text-sm" style={{ color: T.muted }}>
-          Manage your profile and account
+          Manage your profile and security
         </p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b" style={{ borderColor: T.border }}>
-        <button
-          onClick={() => setActiveTab("profile")}
-          className="px-4 py-2 font-semibold text-sm transition-colors"
-          style={{
-            color: activeTab === "profile" ? T.orange : T.muted,
-            borderBottom:
-              activeTab === "profile" ? `2px solid ${T.orange}` : "none",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Profile
-        </button>
-        <button
-          onClick={() => setActiveTab("password")}
-          className="px-4 py-2 font-semibold text-sm transition-colors"
-          style={{
-            color: activeTab === "password" ? T.orange : T.muted,
-            borderBottom:
-              activeTab === "password" ? `2px solid ${T.orange}` : "none",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Password
-        </button>
-      </div>
-
-      {/* Profile Tab */}
-      {activeTab === "profile" && (
-        <div className="space-y-6">
-          {/* Avatar Section */}
-          <div
-            className="rounded-2xl p-6"
-            style={{
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-            }}
-          >
-            <h3 className="text-lg font-bold text-white mb-4">Avatar</h3>
-            <div className="flex items-center gap-6">
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center text-5xl cursor-pointer transition-transform hover:scale-110"
-                style={{
-                  background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
-                }}
-                onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-              >
-                {avatar}
-              </div>
-
-              {showAvatarPicker && (
-                <div className="flex-1">
-                  <p className="text-sm mb-3" style={{ color: T.muted }}>
-                    Choose an avatar:
-                  </p>
-                  <div className="grid grid-cols-6 gap-2">
-                    {AVATARS.map((a) => (
-                      <button
-                        key={a}
-                        onClick={() => handleSelectAvatar(a)}
-                        className="w-12 h-12 rounded-lg flex items-center justify-center text-2xl transition-all hover:scale-110"
-                        style={{
-                          background:
-                            avatar === a ? `${T.orange}30` : T.surface,
-                          border: `2px solid ${avatar === a ? T.orange : T.border}`,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {a}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs mt-3" style={{ color: T.muted }}>
-                    📸 Uploading picture coming soon
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Name Section */}
-          <div
-            className="rounded-2xl p-6"
-            style={{
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-            }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">Personal Info</h3>
-              {!isEditing && (
-                <Btn
-                  variant="outline"
-                  onClick={() => setIsEditing(true)}
-                  style={{ padding: "8px 16px" }}
-                >
-                  Edit
-                </Btn>
-              )}
-            </div>
-
-            {isEditing ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <Input
-                    label="First Name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Enter first name"
-                  />
-                  <Input
-                    label="Last Name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Enter last name"
-                  />
-                </div>
-
-                <Input
-                  label="Email"
-                  type="email"
-                  value={user?.email || ""}
-                  disabled
-                  placeholder="Email"
-                />
-
-                <div className="flex gap-3">
-                  <Btn
-                    onClick={handleSaveProfile}
-                    disabled={loading}
-                    style={{ flex: 1 }}
-                  >
-                    {loading ? "Saving…" : "Save Changes"}
-                  </Btn>
-                  <Btn variant="outline" onClick={() => setIsEditing(false)}>
-                    Cancel
-                  </Btn>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs" style={{ color: T.muted }}>
-                    First Name
-                  </p>
-                  <p className="text-white font-semibold">{firstName}</p>
-                </div>
-                <div>
-                  <p className="text-xs" style={{ color: T.muted }}>
-                    Last Name
-                  </p>
-                  <p className="text-white font-semibold">{lastName}</p>
-                </div>
-                <div>
-                  <p className="text-xs" style={{ color: T.muted }}>
-                    Email
-                  </p>
-                  <p className="text-white font-semibold">{user?.email}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Password Tab */}
-      {activeTab === "password" && (
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Avatar */}
         <div
-          className="rounded-2xl p-6"
+          className="lg:col-span-1 rounded-3xl p-8"
           style={{
             background: T.surface,
             border: `1px solid ${T.border}`,
           }}
         >
-          <h3 className="text-lg font-bold text-white mb-6">Change Password</h3>
+          <div className="text-center">
+            {/* Large Avatar Display */}
+            <div
+              className="w-32 h-32 rounded-full flex items-center justify-center text-7xl mx-auto mb-6 cursor-pointer transition-transform hover:scale-105"
+              style={{
+                background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+              }}
+              onClick={() => setShowAvatarPicker(!showAvatarPicker)}
+            >
+              {avatar}
+            </div>
 
-          <div className="space-y-4 max-w-md">
-            <Input
-              label="Old Password"
+            <p
+              className="text-sm font-semibold mb-6"
+              style={{ color: T.orange }}
+            >
+              Update Avatar
+            </p>
+
+            {/* Avatar Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              {AVATARS.map((a) => (
+                <button
+                  key={a}
+                  onClick={() => handleSelectAvatar(a)}
+                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl transition-all"
+                  style={{
+                    background: avatar === a ? `${T.orange}30` : T.surface,
+                    border: `2px solid ${avatar === a ? T.orange : T.border}`,
+                    cursor: "pointer",
+                  }}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+
+            <p className="text-xs mt-6" style={{ color: T.muted }}>
+              📸 Uploading picture coming soon
+            </p>
+          </div>
+        </div>
+
+        {/* Right Column - Profile Settings */}
+        <div
+          className="lg:col-span-2 rounded-3xl p-8"
+          style={{
+            background: T.surface,
+            border: `1px solid ${T.border}`,
+          }}
+        >
+          <h3
+            className="text-xl font-black text-white mb-6"
+            style={{ fontFamily: "'Georgia',serif" }}
+          >
+            Profile Settings
+          </h3>
+
+          <div className="space-y-4">
+            {/* Name Fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold text-white block mb-2">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Enter first name"
+                  className="w-full px-4 py-2 rounded-xl text-white text-sm"
+                  style={{
+                    background: `${T.orange}15`,
+                    border: `1px solid ${T.orange}30`,
+                    color: "#fff",
+                  }}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-white block mb-2">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Enter last name"
+                  className="w-full px-4 py-2 rounded-xl text-white text-sm"
+                  style={{
+                    background: `${T.orange}15`,
+                    border: `1px solid ${T.orange}30`,
+                    color: "#fff",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Email Field */}
+            <div>
+              <label className="text-xs font-semibold text-white block mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={user?.email || ""}
+                disabled
+                placeholder="Email"
+                className="w-full px-4 py-2 rounded-xl text-sm"
+                style={{
+                  background: `${T.orange}10`,
+                  border: `1px solid ${T.border}`,
+                  color: T.muted,
+                }}
+              />
+            </div>
+
+            {/* Save Button */}
+            <button
+              onClick={handleSaveProfile}
+              disabled={loading}
+              className="w-full py-3 rounded-xl font-bold text-white transition-all mt-6"
+              style={{
+                background: loading
+                  ? `${T.orange}50`
+                  : `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+                border: "none",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Change Password Section */}
+      <div
+        className="rounded-3xl p-8"
+        style={{
+          background: T.surface,
+          border: `1px solid ${T.border}`,
+        }}
+      >
+        <h3
+          className="text-xl font-black text-white mb-6"
+          style={{ fontFamily: "'Georgia',serif" }}
+        >
+          Change Password
+        </h3>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div>
+            <label className="text-xs font-semibold text-white block mb-2">
+              Old Password
+            </label>
+            <input
               type="password"
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
               placeholder="Enter current password"
+              className="w-full px-4 py-2 rounded-xl text-white text-sm"
+              style={{
+                background: `${T.orange}15`,
+                border: `1px solid ${T.orange}30`,
+                color: "#fff",
+              }}
             />
+          </div>
 
-            <Input
-              label="New Password"
+          <div>
+            <label className="text-xs font-semibold text-white block mb-2">
+              New Password
+            </label>
+            <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password (min 6 characters)"
+              placeholder="Min. 8 characters"
+              className="w-full px-4 py-2 rounded-xl text-white text-sm"
+              style={{
+                background: `${T.orange}15`,
+                border: `1px solid ${T.orange}30`,
+                color: "#fff",
+              }}
             />
+          </div>
 
-            <Input
-              label="Confirm New Password"
+          <div>
+            <label className="text-xs font-semibold text-white block mb-2">
+              Confirm New Password
+            </label>
+            <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
+              placeholder="Min. 8 characters"
+              className="w-full px-4 py-2 rounded-xl text-white text-sm"
+              style={{
+                background: `${T.orange}15`,
+                border: `1px solid ${T.orange}30`,
+                color: "#fff",
+              }}
             />
-
-            {passwordError && (
-              <p
-                className="text-xs px-3 py-2 rounded-lg"
-                style={{ color: T.red, background: "rgba(239,68,68,.1)" }}
-              >
-                {passwordError}
-              </p>
-            )}
-
-            <Btn
-              onClick={handleChangePassword}
-              disabled={loading}
-              style={{ width: "100%" }}
-            >
-              {loading ? "Changing…" : "Change Password"}
-            </Btn>
           </div>
         </div>
-      )}
+
+        {passwordError && (
+          <p
+            className="text-xs px-4 py-3 rounded-xl mt-6"
+            style={{ color: T.red, background: "rgba(239,68,68,.1)" }}
+          >
+            {passwordError}
+          </p>
+        )}
+
+        <button
+          onClick={handleChangePassword}
+          disabled={loading}
+          className="w-full py-3 rounded-xl font-bold text-white transition-all mt-6"
+          style={{
+            background: loading
+              ? `${T.orange}50`
+              : `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+            border: "none",
+            cursor: loading ? "not-allowed" : "pointer",
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          {loading ? "Changing..." : "Change Password"}
+        </button>
+      </div>
+
+      {/* Logout */}
+      <button
+        onClick={onLogout}
+        className="w-full py-3 rounded-xl font-bold transition-all"
+        style={{
+          background: `${T.red}20`,
+          color: T.red,
+          border: `1px solid ${T.red}40`,
+          cursor: "pointer",
+        }}
+      >
+        Log Out
+      </button>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Loader from "./constants/Loader";
 import { T } from "./constants/theme";
 import { useState, useEffect } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
 import { auth } from "./authentication/firebase";
 import {
@@ -22,6 +22,7 @@ import { syncUser, getMenuItems, placeOrder, getUserRole } from "./utils/api";
 
 function App() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // ── State for Customer Dashboard ─────────────────────────────────────────
   const [cartItems, setCartItems] = useState([]);
@@ -128,14 +129,17 @@ function App() {
         try {
           const role = await getUserRole();
           setUserRole(role || "customer");
+          localStorage.setItem("userRole", role || "customer");
         } catch (error) {
           console.error("Failed to fetch user role:", error);
-          setUserRole("customer");
+          const cachedRole = localStorage.getItem("userRole") || "customer";
+          setUserRole(cachedRole);
         }
       } else {
         setUser(null);
         setAuthed(false);
         setUserRole("customer");
+        localStorage.removeItem("userRole");
       }
       setAuthLoading(false);
     });
@@ -161,6 +165,15 @@ function App() {
     };
     loadMenu();
   }, []);
+
+  // ── Auto-redirect authenticated users from landing page ────────────────────────────
+  useEffect(() => {
+    if (authed && !authLoading && location.pathname === "/") {
+      const cachedRole = localStorage.getItem("userRole") || userRole;
+      navigate(cachedRole === "admin" ? "/admin" : "/customer");
+    }
+  }, [authed, authLoading, userRole, location.pathname, navigate]);
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -189,7 +202,16 @@ function App() {
       // Sync user to backend with profile info
       await syncUser();
 
-      navigate("/customer");
+      // Fetch user role and navigate accordingly
+      try {
+        const role = await getUserRole();
+        setUserRole(role || "customer");
+        localStorage.setItem("userRole", role || "customer");
+        navigate(role === "admin" ? "/admin" : "/customer");
+      } catch (error) {
+        console.error("Failed to fetch role after signup:", error);
+        navigate("/customer");
+      }
     } catch (error) {
       setError("Failed to sign up: " + error.message);
       console.error("Error code:", error.code, "Message:", error.message);
@@ -218,7 +240,16 @@ function App() {
       // Sync user to backend
       await syncUser();
 
-      navigate("/customer");
+      // Fetch user role and navigate accordingly
+      try {
+        const role = await getUserRole();
+        setUserRole(role || "customer");
+        localStorage.setItem("userRole", role || "customer");
+        navigate(role === "admin" ? "/admin" : "/customer");
+      } catch (error) {
+        console.error("Failed to fetch role after login:", error);
+        navigate("/customer");
+      }
     } catch (error) {
       setError("Invalid email or password");
       console.error("Error code:", error.code, "Message:", error.message);
@@ -254,45 +285,42 @@ function App() {
     if (e.key === "Enter") handleLogin(e);
   };
 
+  // useEffect(
+  //   () => (authed && !authLoading ? navigate("/login") : null),
+  //   [authed, authLoading, navigate],
+  // );
+
   return (
     <Routes>
-      <Route path="/" element={<LandingPage T={T} />} />
+      <Route
+        path="/"
+        element={
+          <LandingPage T={T} authed={authed} authLoading={authLoading} />
+        }
+      />
       <Route
         path="/customer"
         element={
-          authed && !authLoading ? (
-            <Customer
-              T={T}
-              menuItems={menuItems}
-              cartItems={cartItems}
-              setCartItems={setCartItems}
-              cartOpen={cartOpen}
-              setCartOpen={setCartOpen}
-              toast={toast}
-              setToast={setToast}
-              successOrder={successOrder}
-              setSuccessOrder={setSuccessOrder}
-              handleAdd={handleAdd}
-              handleRemove={handleRemove}
-              handleUpdateQty={handleUpdateQty}
-              handleCheckout={handleCheckout}
-              handlePlaceOrder={handlePlaceOrder}
-              authed={authed}
-              user={user}
-              handleLogout={handleLogout}
-            />
-          ) : !authLoading ? (
-            <div style={{ textAlign: "center", paddingTop: "50px" }}>
-              <h2>Please log in to access the customer page</h2>
-              <p>
-                <a href="/Login">Go to Login</a>
-              </p>
-            </div>
-          ) : (
-            <div style={{ textAlign: "center", paddingTop: "50px" }}>
-              <Loader />
-            </div>
-          )
+          <Customer
+            T={T}
+            menuItems={menuItems}
+            cartItems={cartItems}
+            setCartItems={setCartItems}
+            cartOpen={cartOpen}
+            setCartOpen={setCartOpen}
+            toast={toast}
+            setToast={setToast}
+            successOrder={successOrder}
+            setSuccessOrder={setSuccessOrder}
+            handleAdd={handleAdd}
+            handleRemove={handleRemove}
+            handleUpdateQty={handleUpdateQty}
+            handleCheckout={handleCheckout}
+            handlePlaceOrder={handlePlaceOrder}
+            authed={authed}
+            user={user}
+            handleLogout={handleLogout}
+          />
         }
       />
       <Route
