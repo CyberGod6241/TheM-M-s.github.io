@@ -19,6 +19,11 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { syncUser, getMenuItems, placeOrder, getUserRole } from "./utils/api";
+import {
+  saveUserRole,
+  getUserRoleFromDB,
+  onUserRoleChange,
+} from "./utils/databaseService";
 
 function App() {
   const navigate = useNavigate();
@@ -125,21 +130,38 @@ function App() {
         setUser(currentUser);
         setAuthed(true);
 
-        // Fetch user role from backend
+        // if (user) {
+        //   // Force a token refresh to get the latest custom claims
+        //   const idTokenResult = await user.getIdTokenResult(true);
+
+        //   if (idTokenResult.claims.admin) {
+        //     console.log("User is an admin!");
+        //   } else {
+        //     console.log("User is a regular customer.");
+        //   }
+        // }
+
+        // Fetch user role from backend and save to Firebase DB
         try {
           const role = await getUserRole();
           setUserRole(role || "customer");
-          localStorage.setItem("userRole", role || "customer");
+          // Save role to Firebase database
+          await saveUserRole(currentUser.uid, role || "customer");
         } catch (error) {
           console.error("Failed to fetch user role:", error);
-          const cachedRole = localStorage.getItem("userRole") || "customer";
-          setUserRole(cachedRole);
+          // Fallback to Firebase database
+          try {
+            const cachedRole = await getUserRoleFromDB(currentUser.uid);
+            setUserRole(cachedRole || "customer");
+          } catch (dbError) {
+            console.error("Failed to fetch role from Firebase:", dbError);
+            setUserRole("customer");
+          }
         }
       } else {
         setUser(null);
         setAuthed(false);
         setUserRole("customer");
-        localStorage.removeItem("userRole");
       }
       setAuthLoading(false);
     });
@@ -169,8 +191,7 @@ function App() {
   // ── Auto-redirect authenticated users from landing page ────────────────────────────
   useEffect(() => {
     if (authed && !authLoading && location.pathname === "/") {
-      const cachedRole = localStorage.getItem("userRole") || userRole;
-      navigate(cachedRole === "admin" ? "/admin" : "/customer");
+      navigate(userRole === "admin" ? "/admin" : "/customer");
     }
   }, [authed, authLoading, userRole, location.pathname, navigate]);
 
@@ -206,7 +227,8 @@ function App() {
       try {
         const role = await getUserRole();
         setUserRole(role || "customer");
-        localStorage.setItem("userRole", role || "customer");
+        // Save role to Firebase database
+        await saveUserRole(newUser.uid, role || "customer");
         navigate(role === "admin" ? "/admin" : "/customer");
       } catch (error) {
         console.error("Failed to fetch role after signup:", error);
@@ -244,7 +266,8 @@ function App() {
       try {
         const role = await getUserRole();
         setUserRole(role || "customer");
-        localStorage.setItem("userRole", role || "customer");
+        // Save role to Firebase database
+        await saveUserRole(newUser.uid, role || "customer");
         navigate(role === "admin" ? "/admin" : "/customer");
       } catch (error) {
         console.error("Failed to fetch role after login:", error);
@@ -291,104 +314,106 @@ function App() {
   // );
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <LandingPage T={T} authed={authed} authLoading={authLoading} />
-        }
-      />
-      <Route
-        path="/customer"
-        element={
-          <Customer
-            T={T}
-            menuItems={menuItems}
-            cartItems={cartItems}
-            setCartItems={setCartItems}
-            cartOpen={cartOpen}
-            setCartOpen={setCartOpen}
-            toast={toast}
-            setToast={setToast}
-            successOrder={successOrder}
-            setSuccessOrder={setSuccessOrder}
-            handleAdd={handleAdd}
-            handleRemove={handleRemove}
-            handleUpdateQty={handleUpdateQty}
-            handleCheckout={handleCheckout}
-            handlePlaceOrder={handlePlaceOrder}
-            authed={authed}
-            user={user}
-            handleLogout={handleLogout}
-          />
-        }
-      />
-      <Route
-        path="/order"
-        element={
-          <OrderSection
-            T={T}
-            cartItems={cartItems}
-            onPlaceOrder={handlePlaceOrder}
-            successOrder={successOrder}
-            setSuccessOrder={setSuccessOrder}
-          />
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute
-            userRole={userRole}
-            authed={authed}
-            isLoading={authLoading}
-          >
-            <Admin menuItems={menuItems} setMenuItems={setMenuItems} T={T} />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/view-order" element={<ViewOrder T={T} />} />
-      <Route
-        path="/Login"
-        element={
-          <Login
-            T={T}
-            handleKeyDown={handleKeyDownLogin}
-            setPassword={setPassword}
-            setEmail={setEmail}
-            error={error}
-            loading={loading}
-            password={password}
-            email={email}
-            setError={setError}
-            setLoading={setLoading}
-            handleLogin={handleLogin}
-          />
-        }
-      />
-      <Route
-        path="/SignUp"
-        element={
-          <SignUp
-            T={T}
-            handleKeyDown={handleKeyDown}
-            setPassword={setPassword}
-            setEmail={setEmail}
-            error={error}
-            loading={loading}
-            password={password}
-            email={email}
-            setError={setError}
-            setLoading={setLoading}
-            handleSignUp={handleSignUp}
-            firstName={firstName}
-            setFirstName={setFirstName}
-            lastName={lastName}
-            setLastName={setLastName}
-          />
-        }
-      />
-    </Routes>
+    <>
+      {/* {authLoading && <Loader />} */}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <LandingPage T={T} authed={authed} authLoading={authLoading} />
+          }
+        />
+        <Route
+          path="/customer"
+          element={
+            <Customer
+              T={T}
+              menuItems={menuItems}
+              cartItems={cartItems}
+              setCartItems={setCartItems}
+              cartOpen={cartOpen}
+              setCartOpen={setCartOpen}
+              toast={toast}
+              setToast={setToast}
+              successOrder={successOrder}
+              setSuccessOrder={setSuccessOrder}
+              handleAdd={handleAdd}
+              handleRemove={handleRemove}
+              handleUpdateQty={handleUpdateQty}
+              handleCheckout={handleCheckout}
+              handlePlaceOrder={handlePlaceOrder}
+              authed={authed}
+              user={user}
+              handleLogout={handleLogout}
+            />
+          }
+        />
+        <Route
+          path="/order"
+          element={
+            <OrderSection
+              T={T}
+              cartItems={cartItems}
+              onPlaceOrder={handlePlaceOrder}
+              successOrder={successOrder}
+              setSuccessOrder={setSuccessOrder}
+            />
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute
+              userRole={userRole}
+              authed={authed}
+              isLoading={authLoading}
+            >
+              <Admin menuItems={menuItems} setMenuItems={setMenuItems} T={T} />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/view-order" element={<ViewOrder T={T} />} />
+        <Route
+          path="/Login"
+          element={
+            <Login
+              T={T}
+              handleKeyDown={handleKeyDownLogin}
+              setPassword={setPassword}
+              setEmail={setEmail}
+              error={error}
+              loading={loading}
+              password={password}
+              email={email}
+              setError={setError}
+              setLoading={setLoading}
+              handleLogin={handleLogin}
+            />
+          }
+        />
+        <Route
+          path="/SignUp"
+          element={
+            <SignUp
+              handleKeyDown={handleKeyDown}
+              setPassword={setPassword}
+              setEmail={setEmail}
+              error={error}
+              loading={loading}
+              password={password}
+              email={email}
+              setError={setError}
+              setLoading={setLoading}
+              handleSignUp={handleSignUp}
+              firstName={firstName}
+              setFirstName={setFirstName}
+              lastName={lastName}
+              setLastName={setLastName}
+            />
+          }
+        />
+      </Routes>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 
 import Sidebar from "../Admin/components/layouts/Sidebar";
 import { Toast } from "../Admin/components/ui";
+import Loader from "../constants/Loader";
 
 // import Login from "../Admin/pages/Login";
 import Dashboard from "../Admin/pages/Dashboard";
@@ -32,6 +33,7 @@ function Admin({ menuItems, setMenuItems, T }) {
 
   // ── Global data ───────────────────────────────────────────────────────────
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Persist admin login state to localStorage
   // useEffect(() => {
@@ -44,6 +46,7 @@ function Admin({ menuItems, setMenuItems, T }) {
 
     const loadOrders = async () => {
       try {
+        setLoading(true);
         const fetchedOrders = await getAllOrders();
         // Handle different response formats
         const ordersData = Array.isArray(fetchedOrders)
@@ -53,6 +56,8 @@ function Admin({ menuItems, setMenuItems, T }) {
       } catch (error) {
         console.error("Failed to fetch orders:", error);
         setOrders([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -109,92 +114,104 @@ function Admin({ menuItems, setMenuItems, T }) {
 
   // ── Main layout ───────────────────────────────────────────────────────────
   return (
-    <div
-      className="flex min-h-screen"
-      style={{
-        background: T.bg,
-        fontFamily: "'DM Sans',system-ui,sans-serif",
-        color: T.text,
-      }}
-    >
-      {/* Sidebar */}
-      <Sidebar
-        T={T}
-        active={view}
-        setActive={setView}
-        pendingCount={pendingCount}
-        // onLogout={() => setAuthed(false)}
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
-      />
+    <>
+      {/* {loading && <Loader />} */}
+      <div
+        className="flex min-h-screen"
+        style={{
+          background: T.bg,
+          fontFamily: "'DM Sans',system-ui,sans-serif",
+          color: T.text,
+        }}
+      >
+        {/* Sidebar */}
+        <Sidebar
+          T={T}
+          active={view}
+          setActive={setView}
+          pendingCount={pendingCount}
+          // onLogout={() => setAuthed(false)}
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+        />
 
-      {/* Main content area */}
-      <main className="flex-1 overflow-auto">
-        {/* Top bar */}
-        <div
-          className="sticky top-0 z-30 flex items-center justify-between px-6 py-4"
-          style={{
-            background: `${T.bg}ee`,
-            backdropFilter: "blur(12px)",
-            borderBottom: `1px solid ${T.border}`,
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <h1 className="font-semibold text-white capitalize">{view}</h1>
-            {pendingCount > 0 && (
-              <span
-                className="px-2 py-0.5 rounded-full text-xs font-bold animate-pulse"
-                style={{ background: `${T.orange}20`, color: T.orange }}
+        {/* Main content area */}
+        <main className="flex-1 overflow-auto">
+          {/* Top bar */}
+          <div
+            className="sticky top-0 z-30 flex items-center justify-between px-6 py-4"
+            style={{
+              background: `${T.bg}ee`,
+              backdropFilter: "blur(12px)",
+              borderBottom: `1px solid ${T.border}`,
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <h1 className="font-semibold text-white capitalize">{view}</h1>
+              {pendingCount > 0 && (
+                <span
+                  className="px-2 py-0.5 rounded-full text-xs font-bold animate-pulse"
+                  style={{ background: `${T.orange}20`, color: T.orange }}
+                >
+                  {pendingCount} pending
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-xs" style={{ color: T.muted }}>
+                {new Date().toLocaleDateString("en-NG", {
+                  weekday: "short",
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </div>
+              {/* Admin avatar */}
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm"
+                style={{
+                  background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+                }}
               >
-                {pendingCount} pending
-              </span>
+                A
+              </div>
+            </div>
+          </div>
+
+          {/* Page content */}
+          <div className="p-6">
+            {view === "dashboard" && (
+              <Dashboard orders={orders} menuItems={menuItems} T={T} />
             )}
+            {view === "orders" && (
+              <Orders
+                orders={orders}
+                onUpdateStatus={updateOrderStatus}
+                T={T}
+              />
+            )}
+            {view === "menu" && (
+              <MenuManager
+                items={menuItems}
+                onSave={setMenuItems}
+                showToast={showToast}
+                T={T}
+              />
+            )}
+            {view === "analytics" && <Analytics orders={orders} T={T} />}
+            {view === "settings" && <Settings showToast={showToast} T={T} />}
           </div>
-          <div className="flex items-center gap-3">
-            <div className="text-xs" style={{ color: T.muted }}>
-              {new Date().toLocaleDateString("en-NG", {
-                weekday: "short",
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              })}
-            </div>
-            {/* Admin avatar */}
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm"
-              style={{
-                background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
-              }}
-            >
-              A
-            </div>
-          </div>
-        </div>
+        </main>
 
-        {/* Page content */}
-        <div className="p-6">
-          {view === "dashboard" && (
-            <Dashboard orders={orders} menuItems={menuItems} T={T} />
-          )}
-          {view === "orders" && (
-            <Orders orders={orders} onUpdateStatus={updateOrderStatus} T={T} />
-          )}
-          {view === "menu" && (
-            <MenuManager
-              items={menuItems}
-              onSave={setMenuItems}
-              showToast={showToast}
-              T={T}
-            />
-          )}
-          {view === "analytics" && <Analytics orders={orders} T={T} />}
-          {view === "settings" && <Settings showToast={showToast} T={T} />}
-        </div>
-      </main>
-
-      {/* Global toast */}
-      <Toast msg={toast.msg} type={toast.type} visible={toast.visible} T={T} />
-    </div>
+        {/* Global toast */}
+        <Toast
+          msg={toast.msg}
+          type={toast.type}
+          visible={toast.visible}
+          T={T}
+        />
+      </div>
+    </>
   );
 }
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { STATUSES } from "../constants/data";
 import { fmt, fmtDt, statusColor } from "../utils/helpers";
 import { Badge, Btn } from "../components/ui";
+import Loader from "../../constants/Loader";
 
 // ── Order detail modal ────────────────────────────────────────────────────────
 function OrderModal({ order, onClose, onUpdateStatus, T }) {
@@ -22,13 +23,13 @@ function OrderModal({ order, onClose, onUpdateStatus, T }) {
 
   return (
     <>
-      {/* Backdrop */}
+      {" "}
+      {updating && <Loader />} {/* Backdrop */}
       <div
         className="fixed inset-0 z-50"
         style={{ background: "rgba(0,0,0,.7)", backdropFilter: "blur(4px)" }}
         onClick={onClose}
       />
-
       {/* Panel */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div

@@ -1,10 +1,17 @@
 const express = require("express");
+const ratelimit = require("express-rate-limit");
 const cors = require("cors");
 const admin = require("firebase-admin");
 require("dotenv").config();
 
 const useEmulator = Boolean(process.env.FIRESTORE_EMULATOR_HOST);
 const projectId = process.env.FIREBASE_PROJECT_ID || "food-restaurant-f298d";
+
+const limiter = ratelimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: { error: "Too many requests, please try again later." },
+});
 
 let db;
 let auth;
@@ -40,6 +47,7 @@ startFirestore();
 
 const app = express();
 
+app.use(limiter);
 app.use(cors({ origin: true }));
 app.use(express.json());
 

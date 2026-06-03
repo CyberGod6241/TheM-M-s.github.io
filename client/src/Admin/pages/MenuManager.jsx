@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MENU_CATEGORIES, BLANK_MENU_ITEM } from "../constants/data";
 import { fmt } from "../utils/helpers";
 import { Btn, Input, Select } from "../components/ui";
+import Loader from "../../constants/Loader";
 import {
   createMenuItem,
   updateMenuItem,
@@ -176,7 +177,7 @@ export default function MenuManager({ items, onSave, showToast, T }) {
   const [isNew, setIsNew] = useState(false);
   const [search, setSearch] = useState("");
   const [catFilter, setCat] = useState("All");
-
+  const [saving, setSaving] = useState(false);
   const CATS = ["All", ...Array.from(new Set(menu.map((m) => m.category)))];
 
   const filtered = menu.filter((m) => {
@@ -207,6 +208,7 @@ export default function MenuManager({ items, onSave, showToast, T }) {
     }
 
     try {
+      setSaving(true);
       if (isNew) {
         // Create new item via API
         await createMenuItem({
@@ -244,6 +246,8 @@ export default function MenuManager({ items, onSave, showToast, T }) {
     } catch (error) {
       console.error("Failed to save item:", error);
       showToast("❌ Failed to save item", "error");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -252,6 +256,7 @@ export default function MenuManager({ items, onSave, showToast, T }) {
     if (!item) return;
 
     try {
+      setSaving(true);
       await updateMenuItem(id, {
         ...item,
         available: !item.available,
@@ -264,6 +269,8 @@ export default function MenuManager({ items, onSave, showToast, T }) {
     } catch (error) {
       console.error("Failed to toggle availability:", error);
       showToast("❌ Failed to update item", "error");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -271,6 +278,7 @@ export default function MenuManager({ items, onSave, showToast, T }) {
     if (!window.confirm("Delete this menu item?")) return;
 
     try {
+      setSaving(true);
       await deleteMenuItem(id);
       const next = menu.filter((m) => m.id !== id);
       setMenu(next);
@@ -279,162 +287,171 @@ export default function MenuManager({ items, onSave, showToast, T }) {
     } catch (error) {
       console.error("Failed to delete item:", error);
       showToast("❌ Failed to delete item", "error");
+    } finally {
+      setSaving(false);
     }
   };
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2
-            className="text-2xl font-black text-white"
-            style={{ fontFamily: "'Georgia',serif" }}
-          >
-            Menu Manager
-          </h2>
-          <p className="text-sm" style={{ color: T.muted }}>
-            {menu.length} items · {menu.filter((m) => m.available).length}{" "}
-            available
-          </p>
+    <>
+      {saving && <Loader />}
+      <div className="space-y-5">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2
+              className="text-2xl font-black text-white"
+              style={{ fontFamily: "'Georgia',serif" }}
+            >
+              Menu Manager
+            </h2>
+            <p className="text-sm" style={{ color: T.muted }}>
+              {menu.length} items · {menu.filter((m) => m.available).length}{" "}
+              available
+            </p>
+          </div>
+          <Btn onClick={openAdd}>+ Add Item</Btn>
         </div>
-        <Btn onClick={openAdd}>+ Add Item</Btn>
-      </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
-        <input
-          placeholder="Search menu…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-48 px-4 py-2.5 rounded-xl text-sm outline-none"
-          style={{
-            background: T.card,
-            border: `1px solid ${T.border}`,
-            color: T.text,
-            fontFamily: "inherit",
-          }}
-        />
-        {CATS.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCat(c)}
-            className="px-3 py-2 rounded-xl text-xs font-semibold transition-all"
-            style={{
-              background:
-                catFilter === c
-                  ? `linear-gradient(135deg,${T.orange},${T.orangeD})`
-                  : T.card,
-              color: catFilter === c ? "#fff" : T.muted,
-              border: `1px solid ${catFilter === c ? "transparent" : T.border}`,
-              cursor: "pointer",
-            }}
-          >
-            {c}
-          </button>
-        ))}
-      </div>
-
-      {/* Cards grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((item) => (
-          <div
-            key={item.id}
-            className="rounded-2xl overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1"
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3">
+          <input
+            placeholder="Search menu…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 min-w-48 px-4 py-2.5 rounded-xl text-sm outline-none"
             style={{
               background: T.card,
-              border: `1px solid ${item.available ? T.border : "rgba(239,68,68,.2)"}`,
+              border: `1px solid ${T.border}`,
+              color: T.text,
+              fontFamily: "inherit",
             }}
-          >
-            {/* Image */}
-            <div className="relative h-36 overflow-hidden">
-              <img
-                src={
-                  item.img ||
-                  "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400"
-                }
-                alt={item.name}
-                className="w-full h-full object-cover"
-                onError={(e) =>
-                  (e.target.src =
-                    "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400")
-                }
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top,rgba(0,0,0,.7),transparent)",
-                }}
-              />
-              <span className="absolute top-2 right-2 text-xl">
-                {item.emoji}
-              </span>
-              <span
-                className="absolute bottom-2 left-2 text-xs px-2 py-0.5 rounded-full font-semibold"
-                style={{
-                  background: item.available
-                    ? "rgba(34,197,94,.25)"
-                    : "rgba(239,68,68,.25)",
-                  color: item.available ? T.green : T.red,
-                }}
-              >
-                {item.available ? "● Available" : "● Unavailable"}
-              </span>
-            </div>
+          />
+          {CATS.map((c) => (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className="px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+              style={{
+                background:
+                  catFilter === c
+                    ? `linear-gradient(135deg,${T.orange},${T.orangeD})`
+                    : T.card,
+                color: catFilter === c ? "#fff" : T.muted,
+                border: `1px solid ${catFilter === c ? "transparent" : T.border}`,
+                cursor: "pointer",
+              }}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
 
-            {/* Body */}
-            <div className="p-4 flex-1 flex flex-col">
-              <h4 className="font-bold text-white text-sm mb-0.5">
-                {item.name}
-              </h4>
-              <p className="text-xs mb-1" style={{ color: T.muted }}>
-                {item.category}
-              </p>
-              <p
-                className="font-black mb-3"
-                style={{ color: T.orange, fontFamily: "'Georgia',serif" }}
-              >
-                {fmt(item.unitPrice)}{" "}
-                <span
-                  className="text-xs font-normal"
-                  style={{ color: T.muted }}
-                >
-                  / {item.unitLabel}
+        {/* Cards grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map((item) => (
+            <div
+              key={item.id}
+              className="rounded-2xl overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1"
+              style={{
+                background: T.card,
+                border: `1px solid ${item.available ? T.border : "rgba(239,68,68,.2)"}`,
+              }}
+            >
+              {/* Image */}
+              <div className="relative h-36 overflow-hidden">
+                <img
+                  src={
+                    item.img ||
+                    "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400"
+                  }
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) =>
+                    (e.target.src =
+                      "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400")
+                  }
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to top,rgba(0,0,0,.7),transparent)",
+                  }}
+                />
+                <span className="absolute top-2 right-2 text-xl">
+                  {item.emoji}
                 </span>
-              </p>
-
-              <div className="flex gap-2 mt-auto">
-                <Btn small variant="ghost" onClick={() => openEdit(item)}>
-                  Edit
-                </Btn>
-                <Btn
-                  small
-                  variant="outline"
-                  onClick={() => toggleAvail(item.id)}
+                <span
+                  className="absolute bottom-2 left-2 text-xs px-2 py-0.5 rounded-full font-semibold"
+                  style={{
+                    background: item.available
+                      ? "rgba(34,197,94,.25)"
+                      : "rgba(239,68,68,.25)",
+                    color: item.available ? T.green : T.red,
+                  }}
                 >
-                  {item.available ? "Hide" : "Show"}
-                </Btn>
-                <Btn small variant="danger" onClick={() => deleteItem(item.id)}>
-                  🗑
-                </Btn>
+                  {item.available ? "● Available" : "● Unavailable"}
+                </span>
+              </div>
+
+              {/* Body */}
+              <div className="p-4 flex-1 flex flex-col">
+                <h4 className="font-bold text-white text-sm mb-0.5">
+                  {item.name}
+                </h4>
+                <p className="text-xs mb-1" style={{ color: T.muted }}>
+                  {item.category}
+                </p>
+                <p
+                  className="font-black mb-3"
+                  style={{ color: T.orange, fontFamily: "'Georgia',serif" }}
+                >
+                  {fmt(item.unitPrice)}{" "}
+                  <span
+                    className="text-xs font-normal"
+                    style={{ color: T.muted }}
+                  >
+                    / {item.unitLabel}
+                  </span>
+                </p>
+
+                <div className="flex gap-2 mt-auto">
+                  <Btn small variant="ghost" onClick={() => openEdit(item)}>
+                    Edit
+                  </Btn>
+                  <Btn
+                    small
+                    variant="outline"
+                    onClick={() => toggleAvail(item.id)}
+                  >
+                    {item.available ? "Hide" : "Show"}
+                  </Btn>
+                  <Btn
+                    small
+                    variant="danger"
+                    onClick={() => deleteItem(item.id)}
+                  >
+                    🗑
+                  </Btn>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Edit / Add modal */}
-      {editing && (
-        <MenuItemModal
-          item={editing}
-          isNew={isNew}
-          onSave={saveItem}
-          onClose={() => setEditing(null)}
-          T={T}
-        />
-      )}
-    </div>
+        {/* Edit / Add modal */}
+        {editing && (
+          <MenuItemModal
+            item={editing}
+            isNew={isNew}
+            onSave={saveItem}
+            onClose={() => setEditing(null)}
+            T={T}
+          />
+        )}
+      </div>
+    </>
   );
 }
