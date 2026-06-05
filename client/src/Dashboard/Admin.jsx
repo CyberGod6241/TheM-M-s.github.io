@@ -19,7 +19,7 @@ import {
   sendNotificationToAll,
 } from "../utils/api";
 
-function Admin({ menuItems, setMenuItems, T }) {
+function Admin({ menuItems, setMenuItems, T, handleLogout }) {
   // ── Auth ──────────────────────────────────────────────────────────────────
   // Initialize from localStorage if admin is already logged in
   // const [authed, setAuthed] = useState(() => {
@@ -73,7 +73,7 @@ function Admin({ menuItems, setMenuItems, T }) {
     setToast({ msg, type, visible: true });
     toastTimer.current = setTimeout(
       () => setToast((t) => ({ ...t, visible: false })),
-      2800,
+      3000,
     );
   };
 
@@ -130,7 +130,7 @@ function Admin({ menuItems, setMenuItems, T }) {
           active={view}
           setActive={setView}
           pendingCount={pendingCount}
-          // onLogout={() => setAuthed(false)}
+          onLogout={handleLogout}
           collapsed={collapsed}
           setCollapsed={setCollapsed}
         />

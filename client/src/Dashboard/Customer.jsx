@@ -60,10 +60,10 @@ function Customer({
   const [userOrders, setUserOrders] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState({
-    firstName: user?.firstName || "",
-    lastName: user?.lastName || "",
+    firstName: user?.displayName?.split(" ").filter(Boolean)?.[0] || "",
+    lastName: user?.displayName?.split(" ").filter(Boolean)?.[1] || "",
     avatar: user?.avatar || "👨",
   });
 
@@ -75,6 +75,18 @@ function Customer({
   const handleUpdateProfile = (updatedProfile) => {
     setUserProfile(updatedProfile);
   };
+
+  // Update profile whenever user changes (e.g., after signup or login)
+  // useEffect(() => {
+  //   if (user?.displayName) {
+  //     const nameParts = user.displayName.split(" ").filter(Boolean);
+  //     setUserProfile({
+  //       firstName: nameParts[0] || "",
+  //       lastName: nameParts[1] || "",
+  //       avatar: user?.avatar || "👨",
+  //     });
+  //   }
+  // }, [user?.displayName, user?.avatar]);
 
   // Load user orders
   useEffect(() => {
@@ -149,7 +161,7 @@ function Customer({
               borderBottom: `1px solid ${T.border}`,
             }}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-1">
               <h1 className="font-semibold text-white capitalize">{view}</h1>
               {view === "dashboard" && userProfile.firstName && (
                 <span style={{ color: T.muted }} className="text-sm">
@@ -166,6 +178,29 @@ function Customer({
                   year: "numeric",
                 })}
               </div>
+              {/* Cart icon */}
+              <button
+                onClick={() => setCartOpen(!cartOpen)}
+                className="relative flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 hover:scale-110"
+                style={{
+                  border: "none",
+                  cursor: "pointer",
+                }}
+                title="View cart"
+              >
+                <span className="text-lg">🛒</span>
+                {cartItems.length > 0 && (
+                  <span
+                    className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                    style={{
+                      background: `linear-gradient(135deg,${T.orangeD},${T.orange})`,
+                      boxShadow: `0 2px 8px ${T.orange}60`,
+                    }}
+                  >
+                    {cartItems.reduce((s, i) => s + i.qty, 0)}
+                  </span>
+                )}
+              </button>
               {/* User avatar */}
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-white text-sm"

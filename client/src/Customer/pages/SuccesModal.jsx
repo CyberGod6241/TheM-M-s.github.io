@@ -1,4 +1,5 @@
-function SuccessModal({ order, onClose, T, fmt }) {
+import { Link } from "react-router-dom";
+function SuccessModal({ order, T, fmt }) {
   if (!order) return null;
   return (
     <>
@@ -49,17 +50,18 @@ function SuccessModal({ order, onClose, T, fmt }) {
               Total: {fmt(order.total)}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="w-full py-3 rounded-xl font-bold text-white"
-            style={{
-              background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            Continue Browsing
-          </button>
+          <Link to="/Customer">
+            <button
+              className="w-full py-3 rounded-xl font-bold text-white"
+              style={{
+                background: `linear-gradient(135deg,${T.orange},${T.orangeD})`,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Continue Browsing
+            </button>
+          </Link>
         </div>
       </div>
     </>

@@ -34,12 +34,12 @@ export default function Dashboard({ orders, menuItems, T }) {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h2
+        {/* <h2
           className="text-2xl font-black text-white mb-1"
           style={{ fontFamily: "'Georgia',serif" }}
         >
           Dashboard
-        </h2>
+        </h2> */}
         <p className="text-sm" style={{ color: T.muted }}>
           Welcome back, Admin. Here's what's happening today.
         </p>

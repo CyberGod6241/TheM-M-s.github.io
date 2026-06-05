@@ -17,6 +17,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updateProfile,
 } from "firebase/auth";
 import { syncUser, getMenuItems, placeOrder, getUserRole } from "./utils/api";
 import {
@@ -50,7 +51,7 @@ function App() {
 
   const showToast = (msg) => {
     setToast({ msg, visible: true });
-    setTimeout(() => setToast({ msg: "", visible: false }), 2600);
+    setTimeout(() => setToast({ msg: "", visible: false }), 3000);
   };
 
   const handleAdd = (item, qty) => {
@@ -212,6 +213,12 @@ function App() {
         password,
       );
       const newUser = userCredential.user;
+
+      // Update user profile with firstName and lastName
+      await updateProfile(newUser, {
+        displayName: `${firstName} ${lastName}`.trim(),
+      });
+
       setUser(newUser);
       setAuthed(true);
       setEmail("");
@@ -221,7 +228,7 @@ function App() {
       console.log("Signed up:", newUser);
 
       // Sync user to backend with profile info
-      await syncUser();
+      await syncUser({ firstName, lastName });
 
       // Fetch user role and navigate accordingly
       try {
@@ -368,7 +375,12 @@ function App() {
               authed={authed}
               isLoading={authLoading}
             >
-              <Admin menuItems={menuItems} setMenuItems={setMenuItems} T={T} />
+              <Admin
+                menuItems={menuItems}
+                setMenuItems={setMenuItems}
+                T={T}
+                handleLogout={handleLogout}
+              />
             </ProtectedRoute>
           }
         />

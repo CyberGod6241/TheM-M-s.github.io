@@ -128,11 +128,7 @@ export default function Sidebar({
           onMouseLeave={(e) => (e.currentTarget.style.color = T.muted)}
         >
           <span>🚪</span>
-          {!collapsed && (
-            <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <span className="text-sm font-semibold">Logout</span>
-            </Link>
-          )}
+          {!collapsed && <span className="text-sm font-semibold">Logout</span>}
         </button>
       </div>
     </aside>
