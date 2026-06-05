@@ -119,7 +119,7 @@ function OrderModal({ order, onClose, onUpdateStatus, T }) {
                 Order Items
               </p>
               <div className="space-y-2">
-                {current.items.map((it, i) => (
+                {current.items?.map((it, i) => (
                   <div
                     key={i}
                     className="flex items-center gap-3 p-3 rounded-xl"
@@ -357,7 +357,7 @@ export default function Orders({ orders, onUpdateStatus, T }) {
                   className="w-10 h-10 rounded-full flex items-center justify-center font-black text-base shrink-0"
                   style={{ background: `${T.orange}20`, color: T.orange }}
                 >
-                  {o.customer[0]}
+                  {o.customer}
                 </div>
                 <div>
                   <p className="font-bold text-white text-sm leading-tight">
@@ -392,7 +392,7 @@ export default function Orders({ orders, onUpdateStatus, T }) {
                 {o.type === "Delivery" ? "🛵" : "🏪"} {o.type}
               </span>
               <span className="text-xs" style={{ color: T.muted }}>
-                {o.items.length} item{o.items.length !== 1 ? "s" : ""}
+                {o?.items?.length} item{o.items?.length !== 1 ? "s" : ""}
               </span>
               <span className="text-xs" style={{ color: T.muted }}>
                 🕐 {fmtDt(o.time)}
@@ -401,7 +401,7 @@ export default function Orders({ orders, onUpdateStatus, T }) {
 
             {/* Item chips preview */}
             <div className="flex flex-wrap gap-1.5 mb-3">
-              {o.items.slice(0, 4).map((it, i) => (
+              {o.items?.slice(0, 4).map((it, i) => (
                 <span
                   key={i}
                   className="text-xs px-2 py-0.5 rounded-full"
@@ -413,7 +413,7 @@ export default function Orders({ orders, onUpdateStatus, T }) {
                   {it.emoji} {it.name} ×{it.qty}
                 </span>
               ))}
-              {o.items.length > 4 && (
+              {o.items?.length > 4 && (
                 <span
                   className="text-xs px-2 py-0.5 rounded-full"
                   style={{
@@ -421,7 +421,7 @@ export default function Orders({ orders, onUpdateStatus, T }) {
                     color: T.muted,
                   }}
                 >
-                  +{o.items.length - 4} more
+                  +{o.items?.length - 4} more
                 </span>
               )}
             </div>

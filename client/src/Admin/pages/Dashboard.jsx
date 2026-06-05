@@ -155,7 +155,7 @@ export default function Dashboard({ orders, menuItems, T }) {
                   className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
                   style={{ background: `${T.orange}20`, color: T.orange }}
                 >
-                  {o.customer[0]}
+                  {o.customer}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white truncate">
